@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>if(sessionStorage.getItem('eduflow_platform_unlocked')!=='1'){window.location.replace('index.html');}</script>
 <title>Edu Flow Academy — Resultats archives</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
@@ -65,6 +64,22 @@
   .gate-card label{text-align:left;display:block;font-weight:600;font-size:0.85rem;margin-bottom:6px;}
   .gate-card input{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);font-size:1rem;font-family:inherit;margin-bottom:14px;background:#FAFBFB;text-align:center;letter-spacing:.06em;font-weight:700;box-sizing:border-box;}
   .error-msg{color:var(--danger);font-size:0.85rem;margin:-6px 0 14px;display:none;}
+
+  .single-report{display:none;max-width:700px;margin:0 auto;background:var(--card);border-radius:var(--radius);padding:26px;}
+  .single-report .report-header{display:flex;align-items:center;gap:16px;margin-bottom:6px;}
+  .single-report .report-logo{width:60px;height:60px;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.1);flex:none;}
+  .single-report .report-logo img{width:100%;height:100%;object-fit:cover;}
+  .single-report .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+  .single-report .bar-row .lbl{width:140px;font-size:0.85rem;font-weight:600;flex:none;}
+  .single-report .bar-outer{flex:1;height:12px;background:#E4E9E7;border-radius:999px;overflow:hidden;}
+  .single-report .bar-inner{height:100%;background:linear-gradient(90deg,var(--green),var(--blue));}
+  .single-report .bar-pct{width:44px;text-align:right;font-size:0.82rem;color:#7A7B7D;flex:none;}
+
+  @media print{
+    .no-print, .gate-screen{display:none !important;}
+    body.printing-single > *:not(#singleReport){display:none !important;}
+    body.printing-single #singleReport{display:block !important;}
+  }
 </style>
 </head>
 <body>
@@ -111,6 +126,7 @@
         <option value="Complet (100 questions)">Complet (100 questions)</option>
       </select>
       <div class="spacer"></div>
+      <button class="btn-ghost no-print" id="printAllBtn">🖨️ Imprimer / Enregistrer la liste</button>
       <button class="btn-ghost" id="exportBtn">⬇ Exporter en CSV</button>
       <button class="btn-danger" id="clearBtn">🗑 Effacer l'historique</button>
     </div>
@@ -125,6 +141,7 @@
             <th data-key="testType">Type de test &#8645;</th>
             <th data-key="level">Niveau &#8645;</th>
             <th data-key="scorePct">Score &#8645;</th>
+            <th class="no-print">Rapport</th>
           </tr>
         </thead>
         <tbody id="resultsBody"></tbody>
@@ -139,6 +156,8 @@
     Edu Flow Academy — Les donnees sont stockees localement dans ce navigateur uniquement.
   </footer>
 </div>
+
+<div id="singleReport" class="single-report"></div>
 
 <script>
 const STAFF_CODE = 'STAFF-F6WSAR';
@@ -167,6 +186,7 @@ document.getElementById('staffCodeInput').addEventListener('keydown', (e)=>{ if(
 
 let sortKey = 'date';
 let sortDir = -1;
+let currentRows = [];
 
 function loadArchive(){
   try{ return JSON.parse(localStorage.getItem('eduflow_archive') || '[]'); }catch(e){ return []; }
@@ -201,6 +221,7 @@ function render(){
     return 0;
   });
 
+  currentRows = rows;
   const tbody = document.getElementById('resultsBody');
   const emptyState = document.getElementById('emptyState');
   if(rows.length === 0){
@@ -208,7 +229,7 @@ function render(){
     emptyState.style.display = 'block';
   } else {
     emptyState.style.display = 'none';
-    tbody.innerHTML = rows.map(r => `
+    tbody.innerHTML = rows.map((r, idx) => `
       <tr>
         <td>${fmtDate(r.date)}</td>
         <td>${r.name || '—'}</td>
@@ -217,6 +238,7 @@ function render(){
         <td>${r.testType || '—'}</td>
         <td><span class="level-tag">${r.level || '—'}</span></td>
         <td>${r.scorePct != null ? r.scorePct + '%' : '—'}</td>
+        <td class="no-print"><button class="btn-ghost" style="padding:4px 10px;font-size:0.78rem;" onclick="printSingleReport(${idx})">🖨️ Rapport</button></td>
       </tr>
     `).join('');
   }
@@ -245,6 +267,52 @@ document.querySelectorAll('th[data-key]').forEach(th=>{
 document.getElementById('searchBox').addEventListener('input', render);
 document.getElementById('subjectFilter').addEventListener('change', render);
 document.getElementById('typeFilter').addEventListener('change', render);
+
+document.getElementById('printAllBtn').addEventListener('click', ()=>{
+  document.body.classList.remove('printing-single');
+  window.print();
+});
+
+function printSingleReport(idx){
+  const r = currentRows[idx];
+  if(!r) return;
+  const skills = r.skills || {};
+  const skillRows = Object.keys(skills).map(k => `
+    <div class="bar-row">
+      <div class="lbl">${k}</div>
+      <div class="bar-outer"><div class="bar-inner" style="width:${skills[k]}%"></div></div>
+      <div class="bar-pct">${skills[k]}%</div>
+    </div>
+  `).join('');
+  document.getElementById('singleReport').innerHTML = `
+    <div class="report-header">
+      <div class="report-logo"><img id="singleReportLogo" alt="Edu Flow Academy"></div>
+      <div>
+        <div class="brand-name">Edu Flow Academy</div>
+        <div class="brand-sub">Rapport de resultats — Archive</div>
+      </div>
+    </div>
+    <div class="stat-grid" style="margin-top:20px;">
+      <div class="stat-card"><div class="num">${r.name || '—'}</div><div class="lbl">Etudiant(e)</div></div>
+      <div class="stat-card"><div class="num">${r.age || '—'} ans</div><div class="lbl">Age</div></div>
+      <div class="stat-card"><div class="num" style="font-size:1.05rem;">${r.subject || '—'}</div><div class="lbl">Langue</div></div>
+      <div class="stat-card"><div class="num" style="font-size:1.05rem;">${r.testType || '—'}</div><div class="lbl">Type de test</div></div>
+      <div class="stat-card"><div class="num">${r.scorePct != null ? r.scorePct + '%' : '—'}</div><div class="lbl">Score global</div></div>
+    </div>
+    <div style="text-align:center;margin:18px 0;">
+      <div style="font-size:0.85rem;color:#7A7B7D;">Niveau estime</div>
+      <div class="level-badge" style="display:inline-block;font-family:'Quicksand',sans-serif;font-weight:700;font-size:2.2rem;padding:10px 26px;border-radius:16px;color:#fff;background:linear-gradient(135deg,var(--blue),var(--green));margin:10px 0;">${r.level || '—'}</div>
+    </div>
+    ${skillRows ? `<h3 style="font-size:1rem;margin:20px 0 12px;">Detail par competence</h3>${skillRows}` : ''}
+    <div style="font-size:0.78rem;color:#9A9B9C;margin-top:14px;">Date du test : ${fmtDate(r.date)} — Objectif : ${r.objective || '—'}</div>
+  `;
+  const logoImg = document.getElementById('singleReportLogo');
+  const mainLogo = document.querySelector('.logo-wrap img');
+  if(logoImg && mainLogo) logoImg.src = mainLogo.src;
+  document.body.classList.add('printing-single');
+  window.print();
+}
+window.addEventListener('afterprint', ()=>{ document.body.classList.remove('printing-single'); });
 
 document.getElementById('exportBtn').addEventListener('click', ()=>{
   const all = loadArchive();

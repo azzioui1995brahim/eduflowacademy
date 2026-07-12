@@ -116,6 +116,20 @@
   .gate-lead{color:#7A7B7D;font-size:0.92rem;line-height:1.5;margin-bottom:22px;}
   .gate-card label{text-align:left;}
   .gate-card input{text-align:center;letter-spacing:.06em;font-weight:700;}
+
+  .gate-divider{display:flex;align-items:center;gap:12px;margin:22px 0 18px;color:#B8BCBA;font-size:0.78rem;text-transform:uppercase;letter-spacing:.06em;}
+  .gate-divider::before,.gate-divider::after{content:'';flex:1;height:1px;background:var(--line);}
+  .btn-staff{
+    display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+    background:linear-gradient(135deg,#3A3D40,#54585C);color:#fff;text-decoration:none;
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:1rem;
+    border-radius:14px;padding:14px 26px;box-shadow:0 8px 20px rgba(30,32,34,0.25);
+  }
+  .btn-staff:hover{box-shadow:0 10px 26px rgba(30,32,34,0.35);}
+
+  .top-menu{display:flex;gap:18px;justify-content:center;margin:0 0 18px;font-size:0.85rem;}
+  .top-menu a{color:#7A7B7D;text-decoration:none;font-weight:600;padding:6px 4px;}
+  .top-menu a:hover{color:var(--blue-dark);}
 </style>
 </head>
 <body>
@@ -130,6 +144,9 @@
       <input type="text" id="gateCodeInput" placeholder="Ex. : EFA-XXXXXX" autocomplete="off">
       <div class="error-msg" id="gateError">Code incorrect. Merci de reessayer.</div>
       <button class="btn-primary" id="gateBtn">Valider</button>
+
+      <div class="gate-divider">ou</div>
+      <a href="archive.html" class="btn-staff">👩‍🏫 Espace enseignants / Staff access</a>
     </div>
   </div>
 
@@ -192,8 +209,8 @@
       <button class="btn-primary" id="btnGo">Commencer le test 🚀</button>
     </div>
 
-    <div class="admin-link">
-      <a href="archive.html">📊 Voir les resultats archives (espace enseignants)</a>
+    <div class="card" style="margin-top:18px;text-align:center;">
+      <a href="archive.html" class="btn-staff">👩‍🏫 Espace enseignants / Staff access</a>
     </div>
 
     <footer class="mini">Edu Flow Academy — Plateforme d'evaluation linguistique</footer>
