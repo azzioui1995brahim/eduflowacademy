@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edu Flow Academy — Eleves</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+  :root{
+    --blue:#3FAEDD; --blue-dark:#2E8FBD; --green:#7BC46B; --green-dark:#5FA850;
+    --ink:#4A4B4D; --bg:#EEF1F0; --card:#FFFFFF; --line:#DDE3E1; --danger:#E0654F; --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(63,174,221,0.10), transparent 45%),
+      radial-gradient(circle at 90% 100%, rgba(123,196,107,0.12), transparent 45%);
+    color:var(--ink); font-family:'Inter',sans-serif; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; padding:24px 16px 60px;
+  }
+  h1,h2,h3,.brand{font-family:'Quicksand',sans-serif;}
+  .wrap{width:100%;max-width:1040px;}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap;}
+  .brand-name{font-weight:700;font-size:1.2rem;color:var(--ink);}
+  .brand-name a{color:inherit;text-decoration:none;font-size:0.8rem;color:#9A9B9C;font-weight:600;margin-left:10px;}
+  .who{font-size:0.85rem;color:#7A7B7D;}
+  .btn-logout{
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.85rem;
+    border:1.5px solid var(--line);border-radius:12px;padding:9px 16px;cursor:pointer;
+    background:#fff;color:var(--ink);
+  }
+  .btn-logout:hover{border-color:var(--danger);color:var(--danger);}
+
+  .card{
+    background:var(--card);border-radius:var(--radius);padding:26px;
+    box-shadow:0 10px 34px rgba(30,50,60,0.08);border:1px solid var(--line);
+    margin-bottom:20px;
+  }
+  .card h2{margin:0 0 6px;font-size:1.15rem;display:flex;align-items:center;gap:10px;}
+  .card .lead{color:#7A7B7D;font-size:0.88rem;margin:0 0 16px;}
+  .count-badge{
+    background:var(--blue);color:#fff;font-size:0.72rem;font-weight:700;
+    border-radius:999px;padding:2px 9px;font-family:'Inter',sans-serif;
+  }
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+  .toolbar input[type=text], .toolbar select{flex:1;min-width:160px;}
+
+  select, input[type=text], input[type=date], input[type=tel], input[type=email]{
+    padding:9px 11px;border-radius:10px;border:1.5px solid var(--line);
+    font-family:'Inter',sans-serif;font-size:0.88rem;background:#FAFBFB;color:var(--ink);
+  }
+  select:focus, input:focus{outline:none;border-color:var(--blue);}
+
+  .btn-sm{
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.82rem;
+    border:none;border-radius:10px;padding:8px 14px;cursor:pointer;color:#fff;
+  }
+  .btn-primary-sm{background:var(--blue);}
+  .btn-primary-sm:hover{background:var(--blue-dark);}
+  .btn-approve{background:var(--green);}
+  .btn-approve:hover{background:var(--green-dark);}
+  .btn-reject{background:var(--danger);}
+  .btn-reject:hover{opacity:0.88;}
+  .btn-ghost-sm{background:none;color:var(--ink);border:1.5px solid var(--line);}
+  .btn-ghost-sm:hover{border-color:var(--blue);color:var(--blue-dark);}
+  .btn-sm:disabled{opacity:0.5;cursor:not-allowed;}
+
+  .empty-msg{color:#9A9B9C;font-size:0.88rem;padding:8px 0;}
+
+  table.data-table{width:100%;border-collapse:collapse;font-size:0.86rem;}
+  table.data-table th{
+    text-align:left;font-size:0.72rem;text-transform:uppercase;letter-spacing:.04em;
+    color:#9A9B9C;padding:8px 10px;border-bottom:1.5px solid var(--line);
+  }
+  table.data-table td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  table.data-table tr:last-child td{border-bottom:none;}
+  table.data-table tr.clickable{cursor:pointer;}
+  table.data-table tr.clickable:hover{background:#FAFBFB;}
+  .status-pill{display:inline-block;font-size:0.72rem;font-weight:700;border-radius:999px;padding:3px 10px;}
+  .status-active{background:#E8F5E4;color:var(--green-dark);}
+  .status-disabled{background:#FCE9E6;color:var(--danger);}
+  .subject-pill{
+    display:inline-block;font-size:0.72rem;font-weight:700;border-radius:999px;padding:3px 9px;
+    background:rgba(63,174,221,0.12);color:var(--blue-dark);margin:2px 4px 2px 0;
+  }
+  .code-tag{font-family:'Inter',monospace;font-size:0.78rem;color:#9A9B9C;}
+
+  label{display:block;font-weight:600;font-size:0.82rem;margin-bottom:5px;color:var(--ink);}
+  .field{margin-bottom:14px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:600px){.field-row{grid-template-columns:1fr;}}
+  .form-actions{display:flex;gap:10px;margin-top:6px;}
+
+  .lookup-box{
+    background:#F6F8F7;border-left:4px solid var(--green);border-radius:10px;
+    padding:12px 14px;font-size:0.84rem;color:#5B5C5E;margin:10px 0 18px;
+  }
+  .lookup-hit{padding:4px 0;}
+
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:#9A9B9C;font-size:0.85rem;text-decoration:none;margin-bottom:14px;cursor:pointer;}
+  .back-link:hover{color:var(--blue-dark);}
+
+  .enroll-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .enroll-row:last-child{border-bottom:none;}
+  .enroll-info{flex:1;min-width:160px;}
+
+  .loading-msg{text-align:center;color:#9A9B9C;padding:40px 0;}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app" style="display:none;">
+  <div class="topbar">
+    <div class="brand-name">Edu Flow Academy — Eleves</div>
+    <div class="who" id="whoLabel"></div>
+    <button class="btn-logout" id="logoutBtn">Deconnexion</button>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div id="listView">
+    <div class="card">
+      <h2>Eleves <span class="count-badge" id="studentCount">0</span></h2>
+      <p class="lead">Fiches eleves et leurs inscriptions aux classes.</p>
+      <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="Rechercher par nom, code, telephone...">
+        <select id="subjectFilter">
+          <option value="">Toutes les matieres</option>
+          <option value="fr">Francais</option>
+          <option value="en">Anglais</option>
+          <option value="es">Espagnol</option>
+          <option value="nl">Neerlandais</option>
+        </select>
+        <button class="btn-sm btn-primary-sm" id="newStudentBtn" style="display:none;">+ Nouvel eleve</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Nom</th><th>Code</th><th>Matieres inscrites</th><th>Statut</th></tr>
+        </thead>
+        <tbody id="studentsBody"></tbody>
+      </table>
+      <div class="empty-msg" id="studentsEmpty" style="display:none;">Aucun eleve ne correspond a ces criteres.</div>
+    </div>
+  </div>
+
+  <!-- FORM VIEW (new / edit) -->
+  <div id="formView" style="display:none;">
+    <a class="back-link" id="formBackLink">← Retour a la liste</a>
+    <div class="card">
+      <h2 id="formTitle">Nouvel eleve</h2>
+      <div class="field">
+        <label for="fNameInput">Nom complet</label>
+        <input type="text" id="fNameInput" placeholder="Ex. : Sara El Amrani">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fBirthInput">Date de naissance</label>
+          <input type="date" id="fBirthInput">
+        </div>
+        <div class="field">
+          <label for="fPhoneInput">Telephone</label>
+          <input type="tel" id="fPhoneInput" placeholder="Ex. : 06 12 34 56 78">
+        </div>
+      </div>
+      <div class="field">
+        <label for="fEmailInput">Email</label>
+        <input type="email" id="fEmailInput" placeholder="Ex. : sara@example.com">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fGuardianNameInput">Nom du tuteur/parent (si mineur)</label>
+          <input type="text" id="fGuardianNameInput">
+        </div>
+        <div class="field">
+          <label for="fGuardianPhoneInput">Telephone du tuteur/parent</label>
+          <input type="tel" id="fGuardianPhoneInput">
+        </div>
+      </div>
+      <div class="field">
+        <label for="fNotesInput">Notes</label>
+        <input type="text" id="fNotesInput" placeholder="Optionnel">
+      </div>
+
+      <div class="lookup-box" id="lookupBox" style="display:none;">
+        <strong>Resultats de test trouves pour ce nom :</strong>
+        <div id="lookupHits"></div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-sm btn-primary-sm" id="saveStudentBtn">Enregistrer</button>
+        <button class="btn-sm btn-ghost-sm" id="cancelFormBtn">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div id="detailView" style="display:none;">
+    <a class="back-link" id="detailBackLink">← Retour a la liste</a>
+    <div class="card">
+      <h2 id="detailName">—</h2>
+      <p class="lead" id="detailMeta">—</p>
+      <div class="form-actions" id="detailActions"></div>
+    </div>
+    <div class="card">
+      <h2>Inscriptions</h2>
+      <div id="enrollList"></div>
+      <div class="empty-msg" id="enrollEmpty" style="display:none;">Aucune inscription active.</div>
+      <div class="form-actions" style="margin-top:14px;" id="enrollActionWrap">
+        <select id="classPicker"></select>
+        <button class="btn-sm btn-primary-sm" id="enrollBtn">+ Inscrire a cette classe</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loading-msg" id="loadingMsg">Chargement...</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="eduflow-auth.js"></script>
+<script>
+let currentProfile = null;
+let allStudents = [];
+let enrollmentsByStudent = {}; // student_id -> [{class_id, name, subject, level, enrollment_id}]
+let activeClasses = [];
+let currentDetailStudent = null;
+let editingStudentId = null;
+
+function subjectLabel(code){ return EDUFLOW_SUBJECT_LABELS[code] || code; }
+
+function fmtDate(iso){
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('fr-FR', {year:'numeric', month:'short', day:'numeric'});
+}
+
+function canWrite(){
+  return currentProfile && (currentProfile.role === 'admin' || currentProfile.role === 'receptionist');
+}
+
+// ---------- data loading ----------
+
+async function loadAll(){
+  const [{ data: students, error: sErr }, { data: enrollments, error: eErr }, { data: classes, error: cErr }] = await Promise.all([
+    eduflowClient.from('students').select('*').order('full_name'),
+    eduflowClient.from('enrollments').select('id, status, student_id, class_id, classes(name, subject, level)').eq('status', 'active'),
+    eduflowClient.from('classes').select('id, name, subject, level, capacity, teacher_id').eq('status', 'active').order('name')
+  ]);
+  if (sErr){ alert('Erreur de chargement des eleves : ' + sErr.message); return; }
+  if (eErr){ alert('Erreur de chargement des inscriptions : ' + eErr.message); return; }
+  if (cErr){ alert('Erreur de chargement des classes : ' + cErr.message); return; }
+
+  allStudents = students || [];
+  activeClasses = classes || [];
+
+  enrollmentsByStudent = {};
+  (enrollments || []).forEach(e => {
+    if (!e.classes) return;
+    if (!enrollmentsByStudent[e.student_id]) enrollmentsByStudent[e.student_id] = [];
+    enrollmentsByStudent[e.student_id].push({
+      enrollment_id: e.id, class_id: e.class_id,
+      name: e.classes.name, subject: e.classes.subject, level: e.classes.level
+    });
+  });
+
+  renderStudentsTable();
+}
+
+// ---------- list view ----------
+
+function renderStudentsTable(){
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+  const subjectFilter = document.getElementById('subjectFilter').value;
+  const body = document.getElementById('studentsBody');
+  body.innerHTML = '';
+
+  const visible = allStudents.filter(s => {
+    if (search){
+      const hay = (s.full_name + ' ' + (s.student_code||'') + ' ' + (s.phone||'')).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    if (subjectFilter){
+      const subs = (enrollmentsByStudent[s.id] || []).map(e => e.subject);
+      if (!subs.includes(subjectFilter)) return false;
+    }
+    return true;
+  });
+
+  document.getElementById('studentCount').textContent = allStudents.filter(s => s.status === 'active').length;
+  document.getElementById('studentsEmpty').style.display = visible.length ? 'none' : 'block';
+
+  visible.forEach(s => {
+    const subs = enrollmentsByStudent[s.id] || [];
+    const subsHtml = subs.length
+      ? subs.map(e => `<span class="subject-pill">${subjectLabel(e.subject)}</span>`).join('')
+      : '<span style="color:#B8BCBA;">—</span>';
+    const tr = document.createElement('tr');
+    tr.className = 'clickable';
+    tr.innerHTML = `
+      <td>${s.full_name}</td>
+      <td><span class="code-tag">${s.student_code || '—'}</span></td>
+      <td>${subsHtml}</td>
+      <td><span class="status-pill ${s.status==='active'?'status-active':'status-disabled'}">${s.status==='active'?'Actif':'Inactif'}</span></td>
+    `;
+    tr.addEventListener('click', () => openDetail(s.id));
+    body.appendChild(tr);
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', renderStudentsTable);
+document.getElementById('subjectFilter').addEventListener('change', renderStudentsTable);
+
+// ---------- form view (new / edit) ----------
+
+function showView(name){
+  document.getElementById('listView').style.display = name === 'list' ? 'block' : 'none';
+  document.getElementById('formView').style.display = name === 'form' ? 'block' : 'none';
+  document.getElementById('detailView').style.display = name === 'detail' ? 'block' : 'none';
+}
+
+function clearForm(){
+  ['fNameInput','fPhoneInput','fEmailInput','fGuardianNameInput','fGuardianPhoneInput','fNotesInput','fBirthInput'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('lookupBox').style.display = 'none';
+}
+
+function openNewForm(){
+  editingStudentId = null;
+  clearForm();
+  document.getElementById('formTitle').textContent = 'Nouvel eleve';
+  showView('form');
+}
+
+function openEditForm(student){
+  editingStudentId = student.id;
+  document.getElementById('fNameInput').value = student.full_name || '';
+  document.getElementById('fBirthInput').value = student.birth_date || '';
+  document.getElementById('fPhoneInput').value = student.phone || '';
+  document.getElementById('fEmailInput').value = student.email || '';
+  document.getElementById('fGuardianNameInput').value = student.guardian_name || '';
+  document.getElementById('fGuardianPhoneInput').value = student.guardian_phone || '';
+  document.getElementById('fNotesInput').value = student.notes || '';
+  document.getElementById('lookupBox').style.display = 'none';
+  document.getElementById('formTitle').textContent = 'Modifier ' + student.full_name;
+  showView('form');
+}
+
+document.getElementById('newStudentBtn').addEventListener('click', openNewForm);
+document.getElementById('formBackLink').addEventListener('click', () => showView('list'));
+document.getElementById('cancelFormBtn').addEventListener('click', () => showView('list'));
+
+let lookupTimer = null;
+document.getElementById('fNameInput').addEventListener('input', (e) => {
+  clearTimeout(lookupTimer);
+  const name = e.target.value.trim();
+  if (name.length < 3){ document.getElementById('lookupBox').style.display = 'none'; return; }
+  lookupTimer = setTimeout(() => lookupResults(name), 400);
+});
+
+async function lookupResults(name){
+  const { data, error } = await eduflowClient
+    .from('results')
+    .select('name, subject, level, score_pct, test_type, created_at')
+    .ilike('name', '%' + name + '%')
+    .order('created_at', { ascending: false })
+    .limit(5);
+  const box = document.getElementById('lookupBox');
+  const hits = document.getElementById('lookupHits');
+  if (error || !data || !data.length){ box.style.display = 'none'; return; }
+  hits.innerHTML = data.map(r =>
+    `<div class="lookup-hit">${r.name} — ${r.subject} · ${r.level} (${r.score_pct}%) · ${r.test_type} · ${fmtDate(r.created_at)}</div>`
+  ).join('');
+  box.style.display = 'block';
+}
+
+document.getElementById('saveStudentBtn').addEventListener('click', async () => {
+  const full_name = document.getElementById('fNameInput').value.trim();
+  if (!full_name){ alert('Le nom est obligatoire.'); return; }
+  const payload = {
+    full_name,
+    birth_date: document.getElementById('fBirthInput').value || null,
+    phone: document.getElementById('fPhoneInput').value.trim() || null,
+    email: document.getElementById('fEmailInput').value.trim() || null,
+    guardian_name: document.getElementById('fGuardianNameInput').value.trim() || null,
+    guardian_phone: document.getElementById('fGuardianPhoneInput').value.trim() || null,
+    notes: document.getElementById('fNotesInput').value.trim() || null
+  };
+
+  const btn = document.getElementById('saveStudentBtn');
+  btn.disabled = true;
+  let error;
+  if (editingStudentId){
+    ({ error } = await eduflowClient.from('students').update(payload).eq('id', editingStudentId));
+  } else {
+    payload.created_by = currentProfile.id;
+    ({ error } = await eduflowClient.from('students').insert(payload));
+  }
+  btn.disabled = false;
+  if (error){ alert('Erreur : ' + error.message); return; }
+  await loadAll();
+  showView('list');
+});
+
+// ---------- detail view ----------
+
+async function openDetail(studentId){
+  currentDetailStudent = allStudents.find(s => s.id === studentId);
+  if (!currentDetailStudent) return;
+  renderDetail();
+  showView('detail');
+}
+
+function renderDetail(){
+  const s = currentDetailStudent;
+  document.getElementById('detailName').textContent = s.full_name;
+  const bits = [];
+  if (s.student_code) bits.push('Code : ' + s.student_code);
+  if (s.birth_date) bits.push('Ne(e) le ' + fmtDate(s.birth_date));
+  if (s.phone) bits.push('Tel : ' + s.phone);
+  if (s.email) bits.push(s.email);
+  if (s.guardian_name) bits.push('Tuteur : ' + s.guardian_name + (s.guardian_phone ? ' (' + s.guardian_phone + ')' : ''));
+  document.getElementById('detailMeta').textContent = bits.length ? bits.join(' · ') : '—';
+
+  const actions = document.getElementById('detailActions');
+  actions.innerHTML = '';
+  if (canWrite()){
+    const editBtn = document.createElement('button');
+    editBtn.className = 'btn-sm btn-ghost-sm';
+    editBtn.textContent = 'Modifier la fiche';
+    editBtn.addEventListener('click', () => openEditForm(s));
+    actions.appendChild(editBtn);
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'btn-sm ' + (s.status === 'active' ? 'btn-reject' : 'btn-approve');
+    toggleBtn.textContent = s.status === 'active' ? 'Desactiver' : 'Reactiver';
+    toggleBtn.addEventListener('click', async () => {
+      if (s.status === 'active' && !confirm('Desactiver cet eleve ?')) return;
+      const newStatus = s.status === 'active' ? 'inactive' : 'active';
+      const { error } = await eduflowClient.from('students').update({ status: newStatus }).eq('id', s.id);
+      if (error){ alert('Erreur : ' + error.message); return; }
+      await loadAll();
+      currentDetailStudent = allStudents.find(x => x.id === s.id);
+      renderDetail();
+    });
+    actions.appendChild(toggleBtn);
+  }
+
+  renderEnrollments();
+}
+
+function renderEnrollments(){
+  const s = currentDetailStudent;
+  const list = document.getElementById('enrollList');
+  const empty = document.getElementById('enrollEmpty');
+  const enrollments = enrollmentsByStudent[s.id] || [];
+  list.innerHTML = '';
+  empty.style.display = enrollments.length ? 'none' : 'block';
+
+  enrollments.forEach(e => {
+    const row = document.createElement('div');
+    row.className = 'enroll-row';
+    row.innerHTML = `
+      <div class="enroll-info">
+        <strong>${e.name}</strong> — <span class="subject-pill">${subjectLabel(e.subject)}</span> ${e.level || ''}
+      </div>
+    `;
+    if (canWrite()){
+      const dropBtn = document.createElement('button');
+      dropBtn.className = 'btn-sm btn-reject';
+      dropBtn.textContent = 'Retirer';
+      dropBtn.addEventListener('click', async () => {
+        if (!confirm('Retirer cet eleve de cette classe ?')) return;
+        const { error } = await eduflowClient.from('enrollments').update({ status: 'dropped' }).eq('id', e.enrollment_id);
+        if (error){ alert('Erreur : ' + error.message); return; }
+        await loadAll();
+        currentDetailStudent = allStudents.find(x => x.id === s.id);
+        renderDetail();
+      });
+      row.appendChild(dropBtn);
+    }
+    list.appendChild(row);
+  });
+
+  const wrap = document.getElementById('enrollActionWrap');
+  wrap.style.display = canWrite() ? 'flex' : 'none';
+  if (canWrite()){
+    const enrolledIds = enrollments.map(e => e.class_id);
+    const picker = document.getElementById('classPicker');
+    const available = activeClasses.filter(c => !enrolledIds.includes(c.id));
+    picker.innerHTML = available.map(c =>
+      `<option value="${c.id}">${c.name} — ${subjectLabel(c.subject)} ${c.level||''}</option>`
+    ).join('') || '<option value="">Aucune classe disponible</option>';
+  }
+}
+
+document.getElementById('detailBackLink').addEventListener('click', () => showView('list'));
+
+document.getElementById('enrollBtn').addEventListener('click', async () => {
+  const classId = document.getElementById('classPicker').value;
+  if (!classId) return;
+  const cls = activeClasses.find(c => c.id === classId);
+  const currentCount = Object.values(enrollmentsByStudent).flat().filter(e => e.class_id === classId).length;
+  if (cls && currentCount >= cls.capacity){
+    if (!confirm(`Cette classe est a sa capacite maximale (${cls.capacity}). Inscrire quand meme ?`)) return;
+  }
+  const btn = document.getElementById('enrollBtn');
+  btn.disabled = true;
+  const { error } = await eduflowClient.from('enrollments').insert({
+    student_id: currentDetailStudent.id, class_id: classId, created_by: currentProfile.id
+  });
+  btn.disabled = false;
+  if (error){
+    alert(error.code === '23505' ? 'Cet eleve est deja inscrit a cette classe.' : 'Erreur : ' + error.message);
+    return;
+  }
+  await loadAll();
+  currentDetailStudent = allStudents.find(x => x.id === currentDetailStudent.id);
+  renderDetail();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', eduflowLogout);
+
+// ---------- init ----------
+
+(async () => {
+  const result = await eduflowRequireRole(['admin', 'receptionist', 'staff']);
+  if (!result) return;
+  currentProfile = result.profile;
+  document.getElementById('whoLabel').textContent = 'Connecte : ' + (result.profile.full_name || result.profile.email);
+  document.getElementById('newStudentBtn').style.display = canWrite() ? 'inline-block' : 'none';
+
+  const params = new URLSearchParams(window.location.search);
+  const subjectParam = params.get('subject');
+  if (subjectParam) document.getElementById('subjectFilter').value = subjectParam;
+
+  document.getElementById('loadingMsg').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  await loadAll();
+})();
+</script>
+</body>
+</html>

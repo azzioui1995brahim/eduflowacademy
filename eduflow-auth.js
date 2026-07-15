@@ -22,6 +22,15 @@ const EDUFLOW_INVITE_CODES = {
   receptionist: 'RECEPTION-INVITE-7H2WLD'
 };
 
+// Shared subject display labels — classes.subject stores short codes,
+// every page renders the same French label from this one map.
+const EDUFLOW_SUBJECT_LABELS = {
+  fr: 'Francais',
+  en: 'Anglais',
+  es: 'Espagnol',
+  nl: 'Neerlandais'
+};
+
 async function eduflowGetProfile(){
   const { data: { session } } = await eduflowClient.auth.getSession();
   if (!session) return { session: null, profile: null };

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edu Flow Academy — Classes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+  :root{
+    --blue:#3FAEDD; --blue-dark:#2E8FBD; --green:#7BC46B; --green-dark:#5FA850;
+    --ink:#4A4B4D; --bg:#EEF1F0; --card:#FFFFFF; --line:#DDE3E1; --danger:#E0654F; --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(circle at 10% 0%, rgba(63,174,221,0.10), transparent 45%),
+      radial-gradient(circle at 90% 100%, rgba(123,196,107,0.12), transparent 45%);
+    color:var(--ink); font-family:'Inter',sans-serif; min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; padding:24px 16px 60px;
+  }
+  h1,h2,h3,.brand{font-family:'Quicksand',sans-serif;}
+  .wrap{width:100%;max-width:1040px;}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap;}
+  .brand-name{font-weight:700;font-size:1.2rem;color:var(--ink);}
+  .who{font-size:0.85rem;color:#7A7B7D;}
+  .btn-logout{
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.85rem;
+    border:1.5px solid var(--line);border-radius:12px;padding:9px 16px;cursor:pointer;
+    background:#fff;color:var(--ink);
+  }
+  .btn-logout:hover{border-color:var(--danger);color:var(--danger);}
+
+  .card{
+    background:var(--card);border-radius:var(--radius);padding:26px;
+    box-shadow:0 10px 34px rgba(30,50,60,0.08);border:1px solid var(--line);
+    margin-bottom:20px;
+  }
+  .card h2{margin:0 0 6px;font-size:1.15rem;display:flex;align-items:center;gap:10px;}
+  .card .lead{color:#7A7B7D;font-size:0.88rem;margin:0 0 16px;}
+  .count-badge{
+    background:var(--blue);color:#fff;font-size:0.72rem;font-weight:700;
+    border-radius:999px;padding:2px 9px;font-family:'Inter',sans-serif;
+  }
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+  .toolbar input[type=text], .toolbar select{flex:1;min-width:160px;}
+
+  select, input[type=text], input[type=number], input[type=time]{
+    padding:9px 11px;border-radius:10px;border:1.5px solid var(--line);
+    font-family:'Inter',sans-serif;font-size:0.88rem;background:#FAFBFB;color:var(--ink);
+  }
+  select:focus, input:focus{outline:none;border-color:var(--blue);}
+
+  .btn-sm{
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.82rem;
+    border:none;border-radius:10px;padding:8px 14px;cursor:pointer;color:#fff;
+  }
+  .btn-primary-sm{background:var(--blue);}
+  .btn-primary-sm:hover{background:var(--blue-dark);}
+  .btn-approve{background:var(--green);}
+  .btn-approve:hover{background:var(--green-dark);}
+  .btn-reject{background:var(--danger);}
+  .btn-reject:hover{opacity:0.88;}
+  .btn-ghost-sm{background:none;color:var(--ink);border:1.5px solid var(--line);}
+  .btn-ghost-sm:hover{border-color:var(--blue);color:var(--blue-dark);}
+  .btn-xs{
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.75rem;
+    border:none;border-radius:8px;padding:5px 10px;cursor:pointer;color:#fff;background:var(--danger);
+  }
+  .btn-sm:disabled{opacity:0.5;cursor:not-allowed;}
+
+  .empty-msg{color:#9A9B9C;font-size:0.88rem;padding:8px 0;}
+
+  table.data-table{width:100%;border-collapse:collapse;font-size:0.86rem;}
+  table.data-table th{
+    text-align:left;font-size:0.72rem;text-transform:uppercase;letter-spacing:.04em;
+    color:#9A9B9C;padding:8px 10px;border-bottom:1.5px solid var(--line);
+  }
+  table.data-table td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  table.data-table tr:last-child td{border-bottom:none;}
+  table.data-table tr.clickable{cursor:pointer;}
+  table.data-table tr.clickable:hover{background:#FAFBFB;}
+  .status-pill{display:inline-block;font-size:0.72rem;font-weight:700;border-radius:999px;padding:3px 10px;}
+  .status-active{background:#E8F5E4;color:var(--green-dark);}
+  .status-disabled{background:#FCE9E6;color:var(--danger);}
+  .subject-pill{
+    display:inline-block;font-size:0.72rem;font-weight:700;border-radius:999px;padding:3px 9px;
+    background:rgba(63,174,221,0.12);color:var(--blue-dark);
+  }
+  .cap-full{color:var(--danger);font-weight:700;}
+
+  label{display:block;font-weight:600;font-size:0.82rem;margin-bottom:5px;color:var(--ink);}
+  .field{margin-bottom:14px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  @media (max-width:600px){.field-row,.field-row-3{grid-template-columns:1fr;}}
+  .form-actions{display:flex;gap:10px;margin-top:6px;}
+
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:#9A9B9C;font-size:0.85rem;text-decoration:none;margin-bottom:14px;cursor:pointer;}
+  .back-link:hover{color:var(--blue-dark);}
+
+  .schedule-slot{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
+  .schedule-slot select{min-width:110px;}
+
+  .roster-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);}
+  .roster-row:last-child{border-bottom:none;}
+  .roster-info{flex:1;}
+
+  .loading-msg{text-align:center;color:#9A9B9C;padding:40px 0;}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app" style="display:none;">
+  <div class="topbar">
+    <div class="brand-name">Edu Flow Academy — Classes</div>
+    <div class="who" id="whoLabel"></div>
+    <button class="btn-logout" id="logoutBtn">Deconnexion</button>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div id="listView">
+    <div class="card">
+      <h2>Catalogue des classes <span class="count-badge" id="classCount">0</span></h2>
+      <p class="lead" id="listLead">Toutes les classes actives.</p>
+      <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="Rechercher par nom, niveau, enseignant...">
+        <select id="subjectFilter">
+          <option value="">Toutes les matieres</option>
+          <option value="fr">Francais</option>
+          <option value="en">Anglais</option>
+          <option value="es">Espagnol</option>
+          <option value="nl">Neerlandais</option>
+        </select>
+        <button class="btn-sm btn-primary-sm" id="newClassBtn" style="display:none;">+ Nouvelle classe</button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr><th>Nom</th><th>Matiere</th><th>Niveau</th><th>Enseignant</th><th>Effectif</th><th>Statut</th></tr>
+        </thead>
+        <tbody id="classesBody"></tbody>
+      </table>
+      <div class="empty-msg" id="classesEmpty" style="display:none;">Aucune classe ne correspond a ces criteres.</div>
+    </div>
+  </div>
+
+  <!-- FORM VIEW (admin only) -->
+  <div id="formView" style="display:none;">
+    <a class="back-link" id="formBackLink">← Retour a la liste</a>
+    <div class="card">
+      <h2 id="formTitle">Nouvelle classe</h2>
+      <div class="field">
+        <label for="fNameInput">Nom de la classe</label>
+        <input type="text" id="fNameInput" placeholder="Ex. : Anglais B1 - Soir">
+      </div>
+      <div class="field-row-3">
+        <div class="field">
+          <label for="fSubjectInput">Matiere</label>
+          <select id="fSubjectInput">
+            <option value="fr">Francais</option>
+            <option value="en">Anglais</option>
+            <option value="es">Espagnol</option>
+            <option value="nl">Neerlandais</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fLevelInput">Niveau</label>
+          <input type="text" id="fLevelInput" list="levelSuggestions" placeholder="Ex. : B1">
+          <datalist id="levelSuggestions">
+            <option value="Pre-A1"><option value="A1"><option value="A2">
+            <option value="B1"><option value="B2"><option value="C1"><option value="C2">
+            <option value="Junior">
+          </datalist>
+        </div>
+        <div class="field">
+          <label for="fRoomInput">Salle</label>
+          <input type="text" id="fRoomInput" placeholder="Ex. : Salle 2">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fTeacherInput">Enseignant</label>
+          <select id="fTeacherInput"><option value="">— Non assigne —</option></select>
+        </div>
+        <div class="field">
+          <label for="fCapacityInput">Capacite</label>
+          <input type="number" id="fCapacityInput" min="1" value="12">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Horaires</label>
+        <div id="scheduleSlots"></div>
+        <button class="btn-sm btn-ghost-sm" id="addSlotBtn" type="button">+ Ajouter un creneau</button>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-sm btn-primary-sm" id="saveClassBtn">Enregistrer</button>
+        <button class="btn-sm btn-ghost-sm" id="cancelFormBtn">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL / ROSTER VIEW -->
+  <div id="detailView" style="display:none;">
+    <a class="back-link" id="detailBackLink">← Retour a la liste</a>
+    <div class="card">
+      <h2 id="detailName">—</h2>
+      <p class="lead" id="detailMeta">—</p>
+      <div class="form-actions" id="detailActions"></div>
+    </div>
+    <div class="card">
+      <h2>Liste des eleves</h2>
+      <div id="rosterList"></div>
+      <div class="empty-msg" id="rosterEmpty" style="display:none;">Aucun eleve inscrit.</div>
+    </div>
+  </div>
+</div>
+
+<div class="loading-msg" id="loadingMsg">Chargement...</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="eduflow-auth.js"></script>
+<script>
+let currentProfile = null;
+let allClasses = [];
+let rosterCounts = {}; // class_id -> active enrollment count
+let teacherOptions = [];
+let currentDetailClass = null;
+let editingClassId = null;
+
+const WEEKDAYS = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+
+function subjectLabel(code){ return EDUFLOW_SUBJECT_LABELS[code] || code; }
+function isAdmin(){ return currentProfile && currentProfile.role === 'admin'; }
+function canWrite(){ return isAdmin(); } // catalog ownership (create/edit/archive) is admin-only
+
+function scheduleText(schedule){
+  if (!schedule || !schedule.length) return '—';
+  return schedule.map(s => `${s.day.slice(0,3)}. ${s.start}-${s.end}`).join(', ');
+}
+
+// ---------- data loading ----------
+
+async function loadAll(){
+  const { data: classes, error: cErr } = await eduflowClient
+    .from('classes').select('*').order('name');
+  if (cErr){ alert('Erreur de chargement des classes : ' + cErr.message); return; }
+  allClasses = classes || [];
+
+  const { data: enrollments, error: eErr } = await eduflowClient
+    .from('enrollments').select('class_id').eq('status', 'active');
+  if (!eErr){
+    rosterCounts = {};
+    (enrollments || []).forEach(e => { rosterCounts[e.class_id] = (rosterCounts[e.class_id] || 0) + 1; });
+  }
+
+  // Teacher names: admin sees everyone; receptionist sees staff/admin profiles
+  // (Phase 2 RLS extension); staff only ever sees their own classes, where
+  // the teacher IS themselves, so their own name is already known locally.
+  if (isAdmin() || currentProfile.role === 'receptionist'){
+    const { data: profiles } = await eduflowClient
+      .from('profiles').select('id, full_name').eq('role', 'staff').eq('status', 'active');
+    teacherOptions = profiles || [];
+  }
+
+  renderClassesTable();
+}
+
+function teacherName(teacherId){
+  if (!teacherId) return '—';
+  if (currentProfile.id === teacherId) return currentProfile.full_name || currentProfile.email;
+  const t = teacherOptions.find(p => p.id === teacherId);
+  return t ? t.full_name : '—';
+}
+
+// ---------- list view ----------
+
+function renderClassesTable(){
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+  const subjectFilter = document.getElementById('subjectFilter').value;
+  const body = document.getElementById('classesBody');
+  body.innerHTML = '';
+
+  const visible = allClasses.filter(c => {
+    if (subjectFilter && c.subject !== subjectFilter) return false;
+    if (search){
+      const hay = (c.name + ' ' + (c.level||'') + ' ' + teacherName(c.teacher_id)).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  document.getElementById('classCount').textContent = allClasses.filter(c => c.status === 'active').length;
+  document.getElementById('classesEmpty').style.display = visible.length ? 'none' : 'block';
+  document.getElementById('listLead').textContent = currentProfile.role === 'staff'
+    ? 'Vos classes.'
+    : 'Toutes les classes actives.';
+
+  visible.forEach(c => {
+    const count = rosterCounts[c.id] || 0;
+    const full = count >= c.capacity;
+    const tr = document.createElement('tr');
+    tr.className = 'clickable';
+    tr.innerHTML = `
+      <td>${c.name}</td>
+      <td><span class="subject-pill">${subjectLabel(c.subject)}</span></td>
+      <td>${c.level || '—'}</td>
+      <td>${teacherName(c.teacher_id)}</td>
+      <td class="${full ? 'cap-full' : ''}">${count} / ${c.capacity}</td>
+      <td><span class="status-pill ${c.status==='active'?'status-active':'status-disabled'}">${c.status==='active'?'Active':'Archivee'}</span></td>
+    `;
+    tr.addEventListener('click', () => openDetail(c.id));
+    body.appendChild(tr);
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', renderClassesTable);
+document.getElementById('subjectFilter').addEventListener('change', renderClassesTable);
+
+// ---------- form view (admin only) ----------
+
+function showView(name){
+  document.getElementById('listView').style.display = name === 'list' ? 'block' : 'none';
+  document.getElementById('formView').style.display = name === 'form' ? 'block' : 'none';
+  document.getElementById('detailView').style.display = name === 'detail' ? 'block' : 'none';
+}
+
+function populateTeacherSelect(selectedId){
+  const sel = document.getElementById('fTeacherInput');
+  sel.innerHTML = '<option value="">— Non assigne —</option>' +
+    teacherOptions.map(t => `<option value="${t.id}" ${t.id===selectedId?'selected':''}>${t.full_name || t.id}</option>`).join('');
+}
+
+function renderScheduleSlots(schedule){
+  const wrap = document.getElementById('scheduleSlots');
+  wrap.innerHTML = '';
+  (schedule && schedule.length ? schedule : []).forEach(s => addSlotRow(s));
+}
+
+function addSlotRow(existing){
+  const wrap = document.getElementById('scheduleSlots');
+  const row = document.createElement('div');
+  row.className = 'schedule-slot';
+  row.innerHTML = `
+    <select class="slot-day">${WEEKDAYS.map(d => `<option value="${d}" ${existing && existing.day===d ? 'selected':''}>${d}</option>`).join('')}</select>
+    <input type="time" class="slot-start" value="${existing ? existing.start : '18:00'}">
+    <span>a</span>
+    <input type="time" class="slot-end" value="${existing ? existing.end : '19:30'}">
+    <button type="button" class="btn-xs remove-slot-btn">Retirer</button>
+  `;
+  row.querySelector('.remove-slot-btn').addEventListener('click', () => row.remove());
+  wrap.appendChild(row);
+}
+
+document.getElementById('addSlotBtn').addEventListener('click', () => addSlotRow(null));
+
+function collectSchedule(){
+  return Array.from(document.querySelectorAll('#scheduleSlots .schedule-slot')).map(row => ({
+    day: row.querySelector('.slot-day').value,
+    start: row.querySelector('.slot-start').value,
+    end: row.querySelector('.slot-end').value
+  }));
+}
+
+function openNewForm(){
+  editingClassId = null;
+  document.getElementById('fNameInput').value = '';
+  document.getElementById('fSubjectInput').value = 'fr';
+  document.getElementById('fLevelInput').value = '';
+  document.getElementById('fRoomInput').value = '';
+  document.getElementById('fCapacityInput').value = 12;
+  populateTeacherSelect(null);
+  renderScheduleSlots([]);
+  document.getElementById('formTitle').textContent = 'Nouvelle classe';
+  showView('form');
+}
+
+function openEditForm(c){
+  editingClassId = c.id;
+  document.getElementById('fNameInput').value = c.name;
+  document.getElementById('fSubjectInput').value = c.subject;
+  document.getElementById('fLevelInput').value = c.level || '';
+  document.getElementById('fRoomInput').value = c.room || '';
+  document.getElementById('fCapacityInput').value = c.capacity;
+  populateTeacherSelect(c.teacher_id);
+  renderScheduleSlots(c.schedule);
+  document.getElementById('formTitle').textContent = 'Modifier ' + c.name;
+  showView('form');
+}
+
+document.getElementById('newClassBtn').addEventListener('click', openNewForm);
+document.getElementById('formBackLink').addEventListener('click', () => showView('list'));
+document.getElementById('cancelFormBtn').addEventListener('click', () => showView('list'));
+
+document.getElementById('saveClassBtn').addEventListener('click', async () => {
+  const name = document.getElementById('fNameInput').value.trim();
+  if (!name){ alert('Le nom de la classe est obligatoire.'); return; }
+  const capacity = parseInt(document.getElementById('fCapacityInput').value, 10);
+  if (!capacity || capacity < 1){ alert('Capacite invalide.'); return; }
+
+  const payload = {
+    name,
+    subject: document.getElementById('fSubjectInput').value,
+    level: document.getElementById('fLevelInput').value.trim() || null,
+    room: document.getElementById('fRoomInput').value.trim() || null,
+    teacher_id: document.getElementById('fTeacherInput').value || null,
+    capacity,
+    schedule: collectSchedule()
+  };
+
+  const btn = document.getElementById('saveClassBtn');
+  btn.disabled = true;
+  let error;
+  if (editingClassId){
+    ({ error } = await eduflowClient.from('classes').update(payload).eq('id', editingClassId));
+  } else {
+    payload.created_by = currentProfile.id;
+    ({ error } = await eduflowClient.from('classes').insert(payload));
+  }
+  btn.disabled = false;
+  if (error){ alert('Erreur : ' + error.message); return; }
+  await loadAll();
+  showView('list');
+});
+
+// ---------- detail / roster view ----------
+
+async function openDetail(classId){
+  currentDetailClass = allClasses.find(c => c.id === classId);
+  if (!currentDetailClass) return;
+  await renderDetail();
+  showView('detail');
+}
+
+async function renderDetail(){
+  const c = currentDetailClass;
+  document.getElementById('detailName').textContent = c.name;
+  const bits = [subjectLabel(c.subject), c.level || null, c.room ? 'Salle ' + c.room : null,
+    'Enseignant : ' + teacherName(c.teacher_id), scheduleText(c.schedule)].filter(Boolean);
+  document.getElementById('detailMeta').textContent = bits.join(' · ');
+
+  const actions = document.getElementById('detailActions');
+  actions.innerHTML = '';
+  if (canWrite()){
+    const editBtn = document.createElement('button');
+    editBtn.className = 'btn-sm btn-ghost-sm';
+    editBtn.textContent = 'Modifier';
+    editBtn.addEventListener('click', () => openEditForm(c));
+    actions.appendChild(editBtn);
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'btn-sm ' + (c.status === 'active' ? 'btn-reject' : 'btn-approve');
+    toggleBtn.textContent = c.status === 'active' ? 'Archiver' : 'Reactiver';
+    toggleBtn.addEventListener('click', async () => {
+      if (c.status === 'active' && !confirm('Archiver cette classe ?')) return;
+      const newStatus = c.status === 'active' ? 'archived' : 'active';
+      const { error } = await eduflowClient.from('classes').update({ status: newStatus }).eq('id', c.id);
+      if (error){ alert('Erreur : ' + error.message); return; }
+      await loadAll();
+      currentDetailClass = allClasses.find(x => x.id === c.id);
+      await renderDetail();
+    });
+    actions.appendChild(toggleBtn);
+  }
+
+  const { data: roster, error } = await eduflowClient
+    .from('enrollments')
+    .select('id, status, students(id, full_name, student_code)')
+    .eq('class_id', c.id).eq('status', 'active');
+
+  const list = document.getElementById('rosterList');
+  const empty = document.getElementById('rosterEmpty');
+  list.innerHTML = '';
+  const rows = error ? [] : (roster || []).filter(r => r.students);
+  empty.style.display = rows.length ? 'none' : 'block';
+
+  rows.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'roster-row';
+    row.innerHTML = `<div class="roster-info">${r.students.full_name} <span style="color:#9A9B9C;font-size:0.8rem;">${r.students.student_code||''}</span></div>`;
+    if (currentProfile.role === 'admin' || currentProfile.role === 'receptionist'){
+      const dropBtn = document.createElement('button');
+      dropBtn.className = 'btn-xs';
+      dropBtn.textContent = 'Retirer';
+      dropBtn.addEventListener('click', async () => {
+        if (!confirm('Retirer cet eleve de la classe ?')) return;
+        const { error } = await eduflowClient.from('enrollments').update({ status: 'dropped' }).eq('id', r.id);
+        if (error){ alert('Erreur : ' + error.message); return; }
+        await loadAll();
+        currentDetailClass = allClasses.find(x => x.id === c.id);
+        await renderDetail();
+      });
+      row.appendChild(dropBtn);
+    }
+    list.appendChild(row);
+  });
+}
+
+document.getElementById('detailBackLink').addEventListener('click', () => showView('list'));
+document.getElementById('logoutBtn').addEventListener('click', eduflowLogout);
+
+// ---------- init ----------
+
+(async () => {
+  const result = await eduflowRequireRole(['admin', 'receptionist', 'staff']);
+  if (!result) return;
+  currentProfile = result.profile;
+  document.getElementById('whoLabel').textContent = 'Connecte : ' + (result.profile.full_name || result.profile.email);
+  document.getElementById('newClassBtn').style.display = canWrite() ? 'inline-block' : 'none';
+
+  const params = new URLSearchParams(window.location.search);
+  const subjectParam = params.get('subject');
+  if (subjectParam) document.getElementById('subjectFilter').value = subjectParam;
+
+  document.getElementById('loadingMsg').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  await loadAll();
+
+  const idParam = params.get('id');
+  if (idParam && allClasses.find(c => c.id === idParam)) await openDetail(idParam);
+})();
+</script>
+</body>
+</html>

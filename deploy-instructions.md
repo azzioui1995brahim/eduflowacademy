@@ -3,10 +3,15 @@
 A ready-to-upload package is at:
 `C:\Users\Hp\Desktop\platform\eduflow-academy-site.zip`
 
-It contains all 13 files: `index.html`, `archive.html`, `test-fr-junior.html`,
+It contains all 16 files: `index.html`, `archive.html`, `test-fr-junior.html`,
 `test-fr-full.html`, `test-en-junior.html`, `test-en-full.html`, `README.md`,
 `login.html`, `signup.html`, `admin-dashboard.html`, `staff-dashboard.html`,
-`reception-dashboard.html`, `reset-password.html`, `eduflow-auth.js`.
+`reception-dashboard.html`, `reset-password.html`, `eduflow-auth.js`,
+`students.html`, `classes.html`.
+
+Note: the site is currently deployed via GitHub Pages (drag-and-drop file
+upload to the repo), not cPanel — the steps below describe the original
+cPanel plan and are kept for reference if hosting ever moves there.
 
 ## Access codes (client-side gate)
 
@@ -26,20 +31,22 @@ codes only get someone to the signup form — every new account still lands as
 ## One-time database setup (do this before the first upload)
 
 The staff/admin/reception login system needs a few things set up once in
-Supabase: a `profiles` table, some helper functions, and security policies.
+Supabase: tables, some helper functions, and security policies. There are
+two scripts, run in order — each only needs to be pasted once, ever, not on
+every re-upload:
 
 1. Log in to the Supabase dashboard for this project.
 2. Open the **SQL Editor** → **New query**.
-3. Paste in the entire contents of `supabase-setup.sql` (in this folder) and
-   click **Run**. You should see "Success."
-4. In **Authentication → Providers → Email**, confirm "Confirm email" is
+3. Paste in the entire contents of `supabase-setup.sql` (Phase 1: accounts
+   and roles) and click **Run**. You should see "Success."
+4. New query again → paste the entire contents of `supabase-setup-phase2.sql`
+   (Phase 2: students, classes, enrollments) → **Run**.
+5. In **Authentication → Providers → Email**, confirm "Confirm email" is
    enabled (it is by default) — new accounts must click an email link before
    they can log in.
-5. In **Authentication → URL Configuration**, add your live site URL (e.g.
-   `https://eduflowacademy.ma`) to the Redirect URLs, so password-reset and
-   confirmation email links work correctly once the site is live.
-
-This only needs to be done once, ever — not on every re-upload.
+6. In **Authentication → URL Configuration**, add your live site URL to the
+   Redirect URLs, so password-reset and confirmation email links work
+   correctly once the site is live.
 
 ## Steps (cPanel — most common for .ma hosting)
 

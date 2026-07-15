@@ -47,6 +47,18 @@
     border:1.5px dashed var(--line);border-radius:14px;padding:18px 12px;text-align:center;
     color:#B8BCBA;font-weight:700;font-family:'Quicksand',sans-serif;font-size:0.9rem;
   }
+  .my-classes-list{text-align:left;margin-top:6px;}
+  .my-class-row{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;margin-bottom:10px;
+    text-decoration:none;color:var(--ink);background:#fff;transition:border-color .15s;
+  }
+  .my-class-row:hover{border-color:var(--blue);}
+  .my-class-row .subject-pill{
+    display:inline-block;font-size:0.72rem;font-weight:700;border-radius:999px;padding:3px 9px;
+    background:rgba(63,174,221,0.12);color:var(--blue-dark);margin-left:8px;
+  }
+  .empty-msg{color:#9A9B9C;font-size:0.88rem;padding:8px 0;}
   .loading-msg{text-align:center;color:#9A9B9C;padding:40px 0;}
 </style>
 </head>
@@ -67,8 +79,13 @@
       <div class="coming-soon-item">🗓️ Emploi du temps</div>
       <div class="coming-soon-item">✅ Presence</div>
       <div class="coming-soon-item">💳 Paiement / Salaire</div>
-      <div class="coming-soon-item">🏫 Mes classes</div>
     </div>
+  </div>
+
+  <div class="card" style="text-align:left;">
+    <h2 style="text-align:center;">🏫 Mes classes</h2>
+    <div class="my-classes-list" id="myClassesList"></div>
+    <div class="empty-msg" id="myClassesEmpty" style="display:none;text-align:center;">Aucune classe ne vous est assignee pour le moment.</div>
   </div>
 </div>
 
@@ -86,6 +103,28 @@ document.getElementById('logoutBtn').addEventListener('click', eduflowLogout);
   document.getElementById('welcomeMsg').textContent = 'Bienvenue, ' + (result.profile.full_name || 'vous') + ' !';
   document.getElementById('loadingMsg').style.display = 'none';
   document.getElementById('app').style.display = 'block';
+
+  const { data: classes, error } = await eduflowClient
+    .from('classes')
+    .select('id, name, subject, level, room')
+    .eq('teacher_id', result.session.user.id)
+    .eq('status', 'active')
+    .order('name');
+
+  const list = document.getElementById('myClassesList');
+  const empty = document.getElementById('myClassesEmpty');
+  if (!error && classes && classes.length){
+    list.innerHTML = classes.map(c => `
+      <a class="my-class-row" href="classes.html?id=${c.id}">
+        <span>${c.name}${c.room ? ' — Salle ' + c.room : ''}</span>
+        <span class="subject-pill">${EDUFLOW_SUBJECT_LABELS[c.subject] || c.subject}${c.level ? ' ' + c.level : ''}</span>
+      </a>
+    `).join('');
+    empty.style.display = 'none';
+  } else {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+  }
 })();
 </script>
 </body>

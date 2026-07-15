@@ -47,6 +47,17 @@
     border:1.5px dashed var(--line);border-radius:14px;padding:18px 12px;text-align:center;
     color:#B8BCBA;font-weight:700;font-family:'Quicksand',sans-serif;font-size:0.9rem;
   }
+  .tile-link{
+    border:1.5px solid var(--line);border-radius:14px;padding:18px 12px;text-align:center;
+    color:var(--blue-dark);font-weight:700;font-family:'Quicksand',sans-serif;font-size:0.9rem;
+    text-decoration:none;display:block;background:#fff;transition:border-color .15s, transform .15s;
+  }
+  .tile-link:hover{border-color:var(--blue);transform:translateY(-2px);}
+  .quick-add-btn{
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.88rem;
+    border:none;border-radius:12px;padding:11px 20px;cursor:pointer;color:#fff;
+    background:linear-gradient(135deg,var(--blue),var(--green));margin-top:18px;text-decoration:none;display:inline-block;
+  }
   .loading-msg{text-align:center;color:#9A9B9C;padding:40px 0;}
 </style>
 </head>
@@ -62,15 +73,18 @@
   <div class="card">
     <div class="welcome-icon">💁</div>
     <h2 id="welcomeMsg">Bienvenue</h2>
-    <p>Votre espace reception est en cours de construction. Les modules suivants arriveront ici prochainement.</p>
+    <p>Listes des eleves par matiere, et gestion des inscriptions.</p>
     <div class="coming-soon-grid">
-      <div class="coming-soon-item">🇪🇸 Eleves — Espagnol</div>
-      <div class="coming-soon-item">🇫🇷 Eleves — Francais</div>
-      <div class="coming-soon-item">🇬🇧 Eleves — Anglais</div>
-      <div class="coming-soon-item">🇳🇱 Eleves — Neerlandais</div>
+      <a href="students.html?subject=es" class="tile-link">🇪🇸 Eleves — Espagnol</a>
+      <a href="students.html?subject=fr" class="tile-link">🇫🇷 Eleves — Francais</a>
+      <a href="students.html?subject=en" class="tile-link">🇬🇧 Eleves — Anglais</a>
+      <a href="students.html?subject=nl" class="tile-link">🇳🇱 Eleves — Neerlandais</a>
       <div class="coming-soon-item">💳 Paiements eleves</div>
       <div class="coming-soon-item">🗓️ Emploi du temps</div>
     </div>
+    <a href="students.html" class="quick-add-btn">+ Nouvel eleve</a>
+    <br>
+    <a href="classes.html" class="quick-add-btn" style="background:linear-gradient(135deg,#54585C,#3A3D40);">📚 Catalogue des classes</a>
   </div>
 </div>
 

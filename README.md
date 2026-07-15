@@ -39,14 +39,27 @@ pour l'administration, le personnel enseignant et la reception :
 - `eduflow-auth.js` — fichier partagé (connexion à Supabase + vérification du
   rôle), chargé par toutes les pages ci-dessus.
 
-Ces 6 pages (Phase 1) posent seulement la fondation : comptes, mots de passe
-et rôles. Les modules Paiements, Emploi du temps, Présence, Classes et Ateliers
-mentionnés dans le tableau de bord administration arriveront dans une phase
-suivante.
+Ces 6 pages (Phase 1) posent la fondation : comptes, mots de passe et rôles.
 
-**Mise en place unique côté base de données** : le fichier `supabase-setup.sql`
-doit être collé une seule fois dans l'éditeur SQL du tableau de bord Supabase
-avant la première utilisation (voir `deploy-instructions.md`).
+## Élèves & Classes (Phase 2)
+
+- `students.html` — fiches élèves (nom, coordonnées, tuteur), recherche et
+  filtre par matière, inscriptions à des classes. Création/modification
+  réservée à l'administration et à la réception ; le personnel enseignant
+  voit uniquement les élèves inscrits dans ses propres classes.
+- `classes.html` — catalogue des classes (matière, niveau, enseignant,
+  salle, capacité, horaires), avec la liste des élèves inscrits par classe.
+  Création/modification réservée à l'administration ; la réception voit le
+  catalogue complet en lecture seule ; le personnel enseignant ne voit que
+  ses propres classes.
+
+Les modules Paiements, Emploi du temps, Présence et Ateliers mentionnés dans
+le tableau de bord administration arriveront dans une phase suivante.
+
+**Mise en place unique côté base de données** : les fichiers `supabase-setup.sql`
+(Phase 1) et `supabase-setup-phase2.sql` (Phase 2) doivent chacun être collés
+une seule fois dans l'éditeur SQL du tableau de bord Supabase avant la
+première utilisation (voir `deploy-instructions.md`).
 
 ## ⚠️ Important : hébergement requis
 

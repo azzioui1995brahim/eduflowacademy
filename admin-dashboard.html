@@ -130,13 +130,31 @@
   </div>
 
   <div class="card">
+    <h2>Eleves &amp; Classes</h2>
+    <p class="lead">Fiches eleves, catalogue des classes et inscriptions.</p>
+    <div class="coming-soon-grid" style="margin-bottom:16px;">
+      <div class="coming-soon-item" style="border-style:solid;color:var(--blue-dark);"><span class="count-badge" id="studentsCountBadge">—</span><br>Eleves actifs</div>
+      <div class="coming-soon-item" style="border-style:solid;color:var(--green-dark);"><span class="count-badge" id="classesCountBadge" style="background:var(--green);">—</span><br>Classes actives</div>
+    </div>
+    <div class="form-actions" style="display:flex;gap:10px;">
+      <a href="students.html" class="btn-sm btn-approve" style="text-decoration:none;display:inline-block;">Gerer les eleves</a>
+      <a href="classes.html" class="btn-sm btn-reset" style="text-decoration:none;display:inline-block;">Gerer les classes</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📊 Resultats des tests</h2>
+    <p class="lead">Historique des tests de positionnement passes par les eleves — recherche, impression et export.</p>
+    <button class="btn-sm btn-reset" id="openResultsBtn">Ouvrir les resultats</button>
+  </div>
+
+  <div class="card">
     <h2>A venir</h2>
-    <p class="lead">Ces modules s'ajouteront aux comptes ci-dessus dans une prochaine phase.</p>
+    <p class="lead">Ces modules s'ajouteront a la plateforme dans une prochaine phase.</p>
     <div class="coming-soon-grid">
       <div class="coming-soon-item">💳 Paiements</div>
       <div class="coming-soon-item">🗓️ Emploi du temps</div>
       <div class="coming-soon-item">✅ Presence</div>
-      <div class="coming-soon-item">🏫 Classes</div>
       <div class="coming-soon-item">🎓 Ateliers &amp; formations</div>
     </div>
   </div>
@@ -332,6 +350,14 @@ function renderAccounts(){
 document.getElementById('searchInput').addEventListener('input', renderAccounts);
 document.getElementById('logoutBtn').addEventListener('click', eduflowLogout);
 
+// Admin is already authenticated through the real login system, so skip the
+// legacy shared-passphrase gate on the results archive rather than asking
+// for a second code.
+document.getElementById('openResultsBtn').addEventListener('click', () => {
+  try{ sessionStorage.setItem('eduflow_staff_unlocked', '1'); }catch(e){}
+  window.location.href = 'archive.html';
+});
+
 (async () => {
   const result = await eduflowRequireRole(['admin']);
   if (!result) return; // guard already redirected
@@ -340,6 +366,13 @@ document.getElementById('logoutBtn').addEventListener('click', eduflowLogout);
   document.getElementById('loadingMsg').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   await refreshProfiles();
+
+  const [{ count: studentsCount }, { count: classesCount }] = await Promise.all([
+    eduflowClient.from('students').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    eduflowClient.from('classes').select('id', { count: 'exact', head: true }).eq('status', 'active')
+  ]);
+  document.getElementById('studentsCountBadge').textContent = studentsCount ?? '—';
+  document.getElementById('classesCountBadge').textContent = classesCount ?? '—';
 })();
 </script>
 </body>
