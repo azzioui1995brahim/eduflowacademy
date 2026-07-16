@@ -87,6 +87,9 @@
       <label for="emailInput">Adresse email</label>
       <input type="email" id="emailInput" placeholder="Ex. : sara@eduflowacademy.ma">
       <div class="error-msg" id="errEmail">Merci d'indiquer une adresse email valide.</div>
+      <label for="phoneInput">Numero de telephone</label>
+      <input type="tel" id="phoneInput" placeholder="Ex. : 0612345678">
+      <div class="error-msg" id="errPhone">Merci d'indiquer un numero de telephone.</div>
       <label for="passwordInput">Mot de passe</label>
       <div class="pwd-field">
         <input type="password" id="passwordInput" placeholder="8 caracteres minimum">
@@ -150,20 +153,24 @@ document.getElementById('backToCodeLink').addEventListener('click', (e) => {
 document.getElementById('createAccountBtn').addEventListener('click', async () => {
   const name = document.getElementById('nameInput').value.trim();
   const email = document.getElementById('emailInput').value.trim();
+  const phone = document.getElementById('phoneInput').value.trim();
   const password = document.getElementById('passwordInput').value;
   const errName = document.getElementById('errName');
   const errEmail = document.getElementById('errEmail');
+  const errPhone = document.getElementById('errPhone');
   const errPassword = document.getElementById('errPassword');
   const errSubmit = document.getElementById('errSubmit');
   errSubmit.style.display = 'none';
 
   const nameOk = !!name;
   const emailOk = /.+@.+\..+/.test(email);
+  const phoneOk = phone.length >= 6;
   const passwordOk = password.length >= 8;
   errName.style.display = nameOk ? 'none' : 'block';
   errEmail.style.display = emailOk ? 'none' : 'block';
+  errPhone.style.display = phoneOk ? 'none' : 'block';
   errPassword.style.display = passwordOk ? 'none' : 'block';
-  if (!nameOk || !emailOk || !passwordOk) return;
+  if (!nameOk || !emailOk || !phoneOk || !passwordOk) return;
 
   const btn = document.getElementById('createAccountBtn');
   btn.disabled = true;
@@ -171,7 +178,7 @@ document.getElementById('createAccountBtn').addEventListener('click', async () =
 
   const { error } = await eduflowClient.auth.signUp({
     email, password,
-    options: { data: { full_name: name, requested_role: matchedRole } }
+    options: { data: { full_name: name, requested_role: matchedRole, phone } }
   });
 
   if (error){

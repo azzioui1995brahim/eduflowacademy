@@ -201,7 +201,7 @@
 
       <div class="card card-blue" id="messaging">
         <h2>📨 Notifications au personnel</h2>
-        <p class="lead">Envoyer un message a la reception, au personnel enseignant, ou aux deux — chacun le voit dans sa boite de reception.</p>
+        <p class="lead">Envoyer un message a la reception, au personnel enseignant, ou aux deux — chacun le voit dans sa boite de reception. Envoi par SMS pas encore actif (necessite un fournisseur SMS payant) — les numeros de telephone sont deja collectes a l'inscription et prets pour quand vous en aurez un.</p>
         <div class="msg-compose">
           <label for="msgTargetRole">Destinataires</label>
           <select id="msgTargetRole">
@@ -250,7 +250,7 @@
         <div class="table-scroll">
           <table class="accounts-table">
             <thead>
-              <tr><th>Nom</th><th>Email</th><th>Role</th><th>Statut</th><th>Actions</th></tr>
+              <tr><th>Nom</th><th>Email</th><th>Telephone</th><th>Role</th><th>Statut</th><th>Actions</th></tr>
             </thead>
             <tbody id="accountsBody"></tbody>
           </table>
@@ -378,6 +378,7 @@ function renderAccounts(){
     tr.innerHTML = `
       <td>${p.full_name || '(sans nom)'}${isSelf ? '<span class="you-tag">(vous)</span>' : ''}</td>
       <td>${p.email || '—'}</td>
+      <td><input type="text" class="phone-input" data-id="${p.id}" value="${p.phone || ''}" placeholder="—" style="width:120px;"></td>
       <td>
         <select class="role-select" data-id="${p.id}" ${isSelf ? 'disabled' : ''}>
           <option value="pending" ${p.role==='pending'?'selected':''}>En attente</option>
@@ -395,6 +396,20 @@ function renderAccounts(){
       </td>
     `;
     body.appendChild(tr);
+  });
+
+  body.querySelectorAll('.phone-input').forEach(input => {
+    input.addEventListener('change', async () => {
+      const id = input.dataset.id;
+      const { error } = await eduflowClient
+        .from('profiles')
+        .update({ phone: input.value.trim() || null })
+        .eq('id', id);
+      if (error){
+        alert('Erreur : ' + error.message);
+      }
+      await refreshProfiles();
+    });
   });
 
   body.querySelectorAll('.role-select').forEach(sel => {
