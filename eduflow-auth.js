@@ -28,7 +28,7 @@ const EDUFLOW_SUBJECT_LABELS = {
   fr: 'Francais',
   en: 'Anglais',
   es: 'Espagnol',
-  nl: 'Neerlandais'
+  de: 'Allemand'
 };
 
 async function eduflowGetProfile(){

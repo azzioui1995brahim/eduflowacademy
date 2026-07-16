@@ -47,14 +47,14 @@ create trigger students_set_updated_at
   before update on public.students
   for each row execute function public.set_updated_at();  -- reuses Phase 1's function
 
--- 2. Classes — the course catalog. subject uses short codes (fr/en/es/nl)
+-- 2. Classes — the course catalog. subject uses short codes (fr/en/es/de)
 -- rather than results.subject's French words, so Spanish/Dutch have a
 -- home and every page can share one label map (see EDUFLOW_SUBJECT_LABELS
 -- in eduflow-auth.js).
 create table if not exists public.classes (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  subject text not null check (subject in ('fr','en','es','nl')),
+  subject text not null check (subject in ('fr','en','es','de')),
   level text,
   teacher_id uuid references public.profiles(id) on delete set null,
   room text,
