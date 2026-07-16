@@ -669,7 +669,7 @@ function renderDetail(){
     });
     actions.appendChild(toggleBtn);
   }
-  if (currentProfile.role === 'admin'){
+  if (currentProfile.role === 'admin' || currentProfile.role === 'receptionist'){
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'btn-sm btn-reject';
     deleteBtn.style.background = '#8A1F13';
