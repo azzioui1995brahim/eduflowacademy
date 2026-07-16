@@ -114,7 +114,8 @@
   table.receipt-table td:first-child{color:#8A8B8D;width:40%;}
   table.receipt-table td:last-child{font-weight:600;text-align:right;}
   .receipt-amount{font-size:1.2rem;color:var(--green-dark);font-weight:700 !important;}
-  .receipt-signature{margin-top:44px;display:flex;flex-direction:column;align-items:flex-end;}
+  .receipt-thanks{text-align:center;color:#7A7B7D;font-size:0.86rem;margin:22px 0 0;line-height:1.6;}
+  .receipt-signature{margin-top:24px;display:flex;flex-direction:column;align-items:flex-end;}
   .receipt-signature .signature-label{font-size:0.8rem;color:#8A8B8D;margin-bottom:38px;}
   .signature-line{width:220px;border-top:1.5px solid var(--ink);}
 </style>
@@ -171,18 +172,28 @@
           <input type="date" id="fDateInput">
         </div>
       </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fMethodInput">Methode</label>
+          <select id="fMethodInput">
+            <option value="especes">Especes</option>
+            <option value="carte">Carte</option>
+            <option value="virement">Virement</option>
+            <option value="autre">Autre</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fSubjectInput">Matiere (optionnel)</label>
+          <select id="fSubjectInput"><option value="">— Non specifiee —</option></select>
+        </div>
+      </div>
       <div class="field">
-        <label for="fMethodInput">Methode</label>
-        <select id="fMethodInput">
-          <option value="especes">Especes</option>
-          <option value="carte">Carte</option>
-          <option value="virement">Virement</option>
-          <option value="autre">Autre</option>
-        </select>
+        <label for="fPeriodInput">Periode (optionnel)</label>
+        <input type="text" id="fPeriodInput" placeholder="Ex. : Juillet 2026">
       </div>
       <div class="field">
         <label for="fNoteInput">Note</label>
-        <input type="text" id="fNoteInput" placeholder="Optionnel — ex. : Frais d'inscription, Mois de juillet...">
+        <input type="text" id="fNoteInput" placeholder="Optionnel — ex. : Frais d'inscription...">
       </div>
       <div class="form-actions">
         <button class="btn-sm btn-primary-sm" id="savePaymentBtn">Enregistrer</button>
@@ -208,11 +219,15 @@
         <tr><td>Eleve</td><td id="receiptStudent"></td></tr>
         <tr><td>Code eleve</td><td id="receiptCode"></td></tr>
         <tr><td>Date</td><td id="receiptDate"></td></tr>
+        <tr id="receiptPeriodRow" style="display:none;"><td>Periode</td><td id="receiptPeriod"></td></tr>
+        <tr id="receiptSubjectRow" style="display:none;"><td>Matiere</td><td id="receiptSubject"></td></tr>
         <tr><td>Montant</td><td id="receiptAmount" class="receipt-amount"></td></tr>
         <tr><td>Methode</td><td id="receiptMethod"></td></tr>
         <tr><td>Note</td><td id="receiptNote"></td></tr>
         <tr><td>Recu par</td><td id="receiptRecordedBy"></td></tr>
+        <tr id="receiptRemainingRow" style="display:none;"><td>Reste a payer</td><td id="receiptRemaining"></td></tr>
       </table>
+      <p class="receipt-thanks">Merci pour votre confiance.<br>Delivre par Edu Flow Academy.</p>
       <div class="receipt-signature">
         <div class="signature-label">Signature de l'administration</div>
         <div class="signature-line"></div>
@@ -242,7 +257,7 @@ const METHOD_LABELS = { especes:'Especes', carte:'Carte', virement:'Virement', a
 
 async function loadAll(){
   const [{ data: payments, error: pErr }, { data: students, error: sErr }] = await Promise.all([
-    eduflowClient.from('payments').select('id, amount, currency, method, note, paid_at, status, students(id, full_name, student_code), recorder:recorded_by(full_name)').order('paid_at', { ascending: false }),
+    eduflowClient.from('payments').select('id, amount, currency, method, note, subject, period, paid_at, status, students(id, full_name, student_code), recorder:recorded_by(full_name)').order('paid_at', { ascending: false }),
     eduflowClient.from('students').select('id, full_name, student_code').eq('status', 'active').order('full_name')
   ]);
   if (pErr){ alert('Erreur de chargement des paiements : ' + pErr.message); return; }
@@ -309,7 +324,7 @@ function showView(name){
   document.getElementById('receiptView').style.display = name === 'receipt' ? 'block' : 'none';
 }
 
-function openReceipt(p){
+async function openReceipt(p){
   document.getElementById('receiptRef').textContent = 'Recu N° ' + p.id.slice(0, 8).toUpperCase();
   document.getElementById('receiptStudent').textContent = p.students ? p.students.full_name : '—';
   document.getElementById('receiptCode').textContent = p.students ? (p.students.student_code || '—') : '—';
@@ -318,7 +333,28 @@ function openReceipt(p){
   document.getElementById('receiptMethod').textContent = METHOD_LABELS[p.method] || p.method || '—';
   document.getElementById('receiptNote').textContent = p.note || '—';
   document.getElementById('receiptRecordedBy').textContent = (p.recorder && p.recorder.full_name) || 'Edu Flow Academy';
+
+  document.getElementById('receiptPeriodRow').style.display = p.period ? '' : 'none';
+  document.getElementById('receiptPeriod').textContent = p.period || '';
+  document.getElementById('receiptSubjectRow').style.display = p.subject ? '' : 'none';
+  document.getElementById('receiptSubject').textContent = p.subject ? (EDUFLOW_SUBJECT_LABELS[p.subject] || p.subject) : '';
+
   showView('receipt');
+
+  document.getElementById('receiptRemainingRow').style.display = 'none';
+  if (p.students){
+    const [{ data: enrolls }, { data: paid }] = await Promise.all([
+      eduflowClient.from('enrollments').select('expected_amount').eq('student_id', p.students.id).eq('status', 'active'),
+      eduflowClient.from('payments').select('amount').eq('student_id', p.students.id).eq('status', 'active')
+    ]);
+    const expected = (enrolls || []).reduce((sum, e) => sum + (e.expected_amount ? Number(e.expected_amount) : 0), 0);
+    if (expected > 0){
+      const totalPaid = (paid || []).reduce((sum, x) => sum + Number(x.amount), 0);
+      const remaining = Math.max(expected - totalPaid, 0);
+      document.getElementById('receiptRemaining').textContent = fmtAmount(remaining, p.currency);
+      document.getElementById('receiptRemainingRow').style.display = '';
+    }
+  }
 }
 document.getElementById('printReceiptBtn').addEventListener('click', () => window.print());
 document.getElementById('receiptBackLink').addEventListener('click', () => showView('list'));
@@ -331,6 +367,9 @@ function openNewForm(preselectStudentId){
   document.getElementById('fAmountInput').value = '';
   document.getElementById('fDateInput').value = new Date().toISOString().slice(0, 10);
   document.getElementById('fMethodInput').value = 'especes';
+  document.getElementById('fSubjectInput').innerHTML = '<option value="">— Non specifiee —</option>' +
+    Object.entries(EDUFLOW_SUBJECT_LABELS).map(([code, label]) => `<option value="${code}">${label}</option>`).join('');
+  document.getElementById('fPeriodInput').value = '';
   document.getElementById('fNoteInput').value = '';
   showView('form');
 }
@@ -351,6 +390,8 @@ document.getElementById('savePaymentBtn').addEventListener('click', async () => 
     amount,
     paid_at: document.getElementById('fDateInput').value || new Date().toISOString().slice(0, 10),
     method: document.getElementById('fMethodInput').value,
+    subject: document.getElementById('fSubjectInput').value || null,
+    period: document.getElementById('fPeriodInput').value.trim() || null,
     note: document.getElementById('fNoteInput').value.trim() || null,
     recorded_by: currentProfile.id
   };

@@ -38,7 +38,13 @@ const EDUFLOW_SUBJECT_LABELS = {
   ecommerce: 'E-commerce',
   marketing_digital: 'Marketing digital',
   bureautique: 'Bureautique',
-  secourisme: 'Secourisme'
+  secourisme: 'Secourisme',
+  psychomotricite: 'Psychomotricite',
+  psychologue: 'Psychologue',
+  orthophoniste: 'Orthophoniste',
+  educatrice_specialisee: 'Educatrice specialisee',
+  enfants_autistes: 'Accompagnement enfants autistes',
+  enfants_trisomiques: 'Accompagnement enfants trisomiques'
 };
 
 async function eduflowGetProfile(){

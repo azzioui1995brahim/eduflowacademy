@@ -88,11 +88,12 @@
     <div class="welcome-icon">💁</div>
     <h2 id="welcomeMsg">Bienvenue</h2>
     <p>Listes des eleves par matiere, et gestion des inscriptions.</p>
+    <h3 style="margin:18px 0 8px;font-size:0.95rem;">Eleves par matiere</h3>
+    <div class="coming-soon-grid" id="subjectTilesGrid">
+      <a href="students.html" class="tile-link">🎓 Tous les eleves</a>
+    </div>
+    <h3 style="margin:22px 0 8px;font-size:0.95rem;">Outils</h3>
     <div class="coming-soon-grid">
-      <a href="students.html?subject=es" class="tile-link">🇪🇸 Eleves — Espagnol</a>
-      <a href="students.html?subject=fr" class="tile-link">🇫🇷 Eleves — Francais</a>
-      <a href="students.html?subject=en" class="tile-link">🇬🇧 Eleves — Anglais</a>
-      <a href="students.html?subject=de" class="tile-link">🇩🇪 Eleves — Allemand</a>
       <a href="payments.html" class="tile-link">💳 Paiements eleves</a>
       <a href="timetable.html" class="tile-link">🗓️ Emploi du temps</a>
       <a href="attendance.html" class="tile-link">✅ Presence</a>
@@ -112,7 +113,27 @@
 <script>
 document.getElementById('logoutBtn').addEventListener('click', eduflowLogout);
 
+const SUBJECT_ICONS = {
+  fr: '🇫🇷', en: '🇬🇧', es: '🇪🇸', de: '🇩🇪',
+  drone: '🛸', ia: '🤖', infographie: '🎨', ecommerce: '🛒',
+  marketing_digital: '📱', bureautique: '💻', secourisme: '🚑',
+  psychomotricite: '🤸', psychologue: '🧠', orthophoniste: '🗣️',
+  educatrice_specialisee: '🧩', enfants_autistes: '🧩', enfants_trisomiques: '🌟'
+};
+
+function renderSubjectTiles(){
+  const grid = document.getElementById('subjectTilesGrid');
+  Object.entries(EDUFLOW_SUBJECT_LABELS).forEach(([code, label]) => {
+    const a = document.createElement('a');
+    a.href = 'students.html?subject=' + code;
+    a.className = 'tile-link';
+    a.textContent = (SUBJECT_ICONS[code] || '📚') + ' Eleves — ' + label;
+    grid.appendChild(a);
+  });
+}
+
 (async () => {
+  renderSubjectTiles();
   const result = await eduflowRequireRole(['receptionist', 'admin']);
   if (!result) return;
   eduflowShowDeniedBanner();

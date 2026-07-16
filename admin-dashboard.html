@@ -153,6 +153,7 @@
         <button class="sidebar-link" id="openResultsBtn">📊 Resultats des tests</button>
         <a href="statistics.html" class="sidebar-link">📈 Statistiques</a>
         <a href="#messaging" class="sidebar-link">📨 Notifications</a>
+        <a href="inbox.html" class="sidebar-link">📥 Declarations de suppression<span id="inboxBadge" class="count-badge" style="display:none;margin-left:6px;background:var(--danger);"></span></a>
         <div class="sidebar-divider"></div>
         <a href="staff-dashboard.html" class="sidebar-link">👩‍🏫 Espace enseignant</a>
         <a href="reception-dashboard.html" class="sidebar-link">💁 Espace reception</a>
@@ -529,6 +530,18 @@ document.getElementById('openResultsBtnCard').addEventListener('click', openResu
   ]);
   document.getElementById('studentsCountBadge').textContent = studentsCount ?? '—';
   document.getElementById('classesCountBadge').textContent = classesCount ?? '—';
+
+  const [{ data: adminMessages }, { data: adminReads }] = await Promise.all([
+    eduflowClient.from('messages').select('id, target_role').in('target_role', ['admin', 'all']),
+    eduflowClient.from('message_reads').select('message_id').eq('reader_id', currentAdminId)
+  ]);
+  const readMsgIds = new Set((adminReads || []).map(r => r.message_id));
+  const unreadCount = (adminMessages || []).filter(m => !readMsgIds.has(m.id)).length;
+  if (unreadCount > 0){
+    const badge = document.getElementById('inboxBadge');
+    badge.textContent = unreadCount;
+    badge.style.display = 'inline-block';
+  }
 })();
 </script>
 </body>

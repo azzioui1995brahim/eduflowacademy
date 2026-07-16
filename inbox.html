@@ -94,9 +94,10 @@
 <script src="eduflow-auth.js"></script>
 <script>
 let myId = null;
+let myRole = null;
 let readIds = new Set();
 
-const TARGET_LABELS = { all: 'Tout le personnel', staff: 'Personnel enseignant', receptionist: 'Reception' };
+const TARGET_LABELS = { all: 'Tout le personnel', staff: 'Personnel enseignant', receptionist: 'Reception', admin: 'Administration' };
 
 function fmtDate(iso){
   return new Date(iso).toLocaleDateString('fr-FR', { year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
@@ -110,12 +111,17 @@ async function loadMessages(){
   if (mErr){ alert('Erreur de chargement des messages : ' + mErr.message); return; }
   readIds = new Set((reads||[]).map(r => r.message_id));
 
+  // Admin's SELECT policy sees every message (needed to compose to any
+  // role); this personal inbox should only show what's actually addressed
+  // to this viewer, same as staff/receptionist already get from RLS.
+  const relevant = (messages||[]).filter(m => m.target_role === myRole || m.target_role === 'all');
+
   const list = document.getElementById('msgList');
   const empty = document.getElementById('msgEmpty');
   list.innerHTML = '';
-  empty.style.display = (messages && messages.length) ? 'none' : 'block';
+  empty.style.display = relevant.length ? 'none' : 'block';
 
-  (messages||[]).forEach(m => {
+  relevant.forEach(m => {
     const isUnread = !readIds.has(m.id);
     const row = document.createElement('div');
     row.className = 'msg-row' + (isUnread ? ' unread' : '');
@@ -147,6 +153,7 @@ document.getElementById('logoutBtn').addEventListener('click', eduflowLogout);
   if (!result) return;
   eduflowShowDeniedBanner();
   myId = result.session.user.id;
+  myRole = result.profile.role;
   document.getElementById('whoLabel').textContent = 'Connecte : ' + (result.profile.full_name || result.profile.email);
   document.getElementById('backLink').href = result.profile.role === 'admin' ? 'admin-dashboard.html'
     : result.profile.role === 'receptionist' ? 'reception-dashboard.html' : 'staff-dashboard.html';
