@@ -153,6 +153,7 @@ function renderGrid(){
   const byDay = {};
   WEEKDAYS.forEach(d => byDay[d] = []);
   allClasses.forEach(c => {
+    if (currentProfile.role === 'staff' && c.teacher_id !== currentProfile.id) return;
     if (subjectFilter && c.subject !== subjectFilter) return;
     (c.schedule || []).forEach(slot => {
       if (byDay[slot.day]){

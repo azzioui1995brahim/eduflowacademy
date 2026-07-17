@@ -112,6 +112,22 @@
   .back-link{display:inline-flex;align-items:center;gap:6px;color:#9A9B9C;font-size:0.85rem;text-decoration:none;margin-bottom:14px;cursor:pointer;}
   .back-link:hover{color:var(--blue-dark);}
 
+  .catalog-breadcrumb{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:0.85rem;color:#9A9B9C;margin-bottom:14px;}
+  .catalog-breadcrumb a{color:var(--blue-dark);text-decoration:none;font-weight:600;cursor:pointer;}
+  .catalog-breadcrumb a:hover{text-decoration:underline;}
+  .tile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:8px;}
+  .tile{
+    background:#FAFBFB;border:1.5px solid var(--line);border-radius:14px;padding:20px 14px;text-align:center;cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  }
+  .tile:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(30,50,60,0.10);border-color:var(--blue);}
+  .tile .tile-icon{
+    font-size:1.5rem;width:44px;height:44px;border-radius:12px;background:rgba(63,174,221,0.10);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 10px;
+  }
+  .tile .tile-label{font-weight:700;font-family:'Quicksand',sans-serif;font-size:0.92rem;}
+  .tile .tile-count{color:#9A9B9C;font-size:0.76rem;margin-top:4px;}
+
   .schedule-slot{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
   .schedule-slot select{min-width:110px;}
 
@@ -147,30 +163,13 @@
       <p class="lead" id="listLead">Toutes les classes actives.</p>
       <div class="toolbar no-print">
         <input type="text" id="searchInput" placeholder="Rechercher par nom, niveau, enseignant...">
-        <select id="subjectFilter">
-          <option value="">Toutes les matieres</option>
-          <option value="fr">Francais</option>
-          <option value="en">Anglais</option>
-          <option value="es">Espagnol</option>
-          <option value="de">Allemand</option>
-          <option value="drone">Drone</option>
-          <option value="ia">Intelligence Artificielle</option>
-          <option value="infographie">Infographie</option>
-          <option value="ecommerce">E-commerce</option>
-          <option value="marketing_digital">Marketing digital</option>
-          <option value="bureautique">Bureautique</option>
-          <option value="secourisme">Secourisme</option>
-          <option value="psychomotricite">Psychomotricite</option>
-          <option value="psychologue">Psychologue</option>
-          <option value="orthophoniste">Orthophoniste</option>
-          <option value="educatrice_specialisee">Educatrice specialisee</option>
-          <option value="enfants_autistes">Accompagnement enfants autistes</option>
-          <option value="enfants_trisomiques">Accompagnement enfants trisomiques</option>
-        </select>
         <button class="btn-sm btn-primary-sm" id="newClassBtn" style="display:none;">+ Nouvelle classe</button>
         <button class="btn-sm btn-ghost-sm" id="printListBtn">🖨️ Imprimer</button>
       </div>
-      <table class="data-table">
+      <div class="catalog-breadcrumb no-print" id="catalogBreadcrumb"></div>
+      <div class="tile-grid" id="subjectsGrid"></div>
+      <div class="tile-grid" id="levelsGrid" style="display:none;"></div>
+      <table class="data-table" id="classesTable" style="display:none;">
         <thead>
           <tr><th>Nom</th><th>Matiere</th><th>Niveau</th><th>Enseignant</th><th>Effectif</th><th>Statut</th></tr>
         </thead>
@@ -263,6 +262,10 @@
     </div>
     <div class="card">
       <h2>Liste des eleves</h2>
+      <div class="toolbar no-print" id="addStudentBar" style="display:none;">
+        <select id="addStudentSelect"><option value="">— Choisir un eleve a inscrire —</option></select>
+        <button class="btn-sm btn-primary-sm" id="addStudentBtn">+ Inscrire</button>
+      </div>
       <div id="rosterList"></div>
       <div class="empty-msg" id="rosterEmpty" style="display:none;">Aucun eleve inscrit.</div>
     </div>
@@ -278,6 +281,7 @@ let currentProfile = null;
 let allClasses = [];
 let rosterCounts = {}; // class_id -> active enrollment count
 let teacherOptions = [];
+let allStudents = [];
 let currentDetailClass = null;
 let editingClassId = null;
 
@@ -315,9 +319,13 @@ async function loadAll(){
     const { data: profiles } = await eduflowClient
       .from('profiles').select('id, full_name').eq('role', 'staff').eq('status', 'active');
     teacherOptions = profiles || [];
+
+    const { data: students } = await eduflowClient
+      .from('students').select('id, full_name, student_code').eq('status', 'active').order('full_name');
+    allStudents = students || [];
   }
 
-  renderClassesTable();
+  renderCatalog();
 }
 
 function teacherName(teacherId){
@@ -329,28 +337,139 @@ function teacherName(teacherId){
 
 // ---------- list view ----------
 
-function renderClassesTable(){
-  const search = document.getElementById('searchInput').value.trim().toLowerCase();
-  const subjectFilter = document.getElementById('subjectFilter').value;
-  const body = document.getElementById('classesBody');
-  body.innerHTML = '';
+// ---------- catalog browsing: subjects -> levels -> classes ----------
+// Search text (when present) bypasses the drill-down entirely and shows a
+// flat filtered table across every class, same as the old single-table view.
 
-  const visible = allClasses.filter(c => {
-    if (subjectFilter && c.subject !== subjectFilter) return false;
-    if (search){
-      const hay = (c.name + ' ' + (c.level||'') + ' ' + teacherName(c.teacher_id)).toLowerCase();
-      if (!hay.includes(search)) return false;
-    }
-    return true;
-  });
+let catalogSubject = null; // null => showing the subjects grid
+let catalogLevel = null;   // null => showing the levels grid (once a subject is picked)
+
+function classesForSubject(subject){
+  return allClasses.filter(c => c.subject === subject);
+}
+function distinctSubjects(){
+  return Array.from(new Set(allClasses.map(c => c.subject)));
+}
+function levelKey(c){ return c.level || 'Sans niveau'; }
+function distinctLevels(subject){
+  return Array.from(new Set(classesForSubject(subject).map(levelKey)));
+}
+function subjectIcon(code){
+  return (typeof subjectTheme === 'function') ? subjectTheme(code).icon : '🎓';
+}
+
+function renderCatalog(){
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+  const subjectsGrid = document.getElementById('subjectsGrid');
+  const levelsGrid = document.getElementById('levelsGrid');
+  const table = document.getElementById('classesTable');
+  const breadcrumb = document.getElementById('catalogBreadcrumb');
 
   document.getElementById('classCount').textContent = allClasses.filter(c => c.status === 'active').length;
-  document.getElementById('classesEmpty').style.display = visible.length ? 'none' : 'block';
   document.getElementById('listLead').textContent = currentProfile.role === 'staff'
     ? 'Vos classes.'
     : 'Toutes les classes actives.';
 
-  visible.forEach(c => {
+  if (search){
+    breadcrumb.style.display = 'none';
+    subjectsGrid.style.display = 'none';
+    levelsGrid.style.display = 'none';
+    table.style.display = '';
+    const visible = allClasses.filter(c => {
+      const hay = (c.name + ' ' + (c.level||'') + ' ' + subjectLabel(c.subject) + ' ' + teacherName(c.teacher_id)).toLowerCase();
+      return hay.includes(search);
+    });
+    renderClassesTable(visible);
+    return;
+  }
+
+  breadcrumb.style.display = 'flex';
+  renderBreadcrumb();
+
+  if (!catalogSubject){
+    subjectsGrid.style.display = 'grid';
+    levelsGrid.style.display = 'none';
+    table.style.display = 'none';
+    renderSubjectsGrid();
+    document.getElementById('classesEmpty').style.display = distinctSubjects().length ? 'none' : 'block';
+    return;
+  }
+
+  if (!catalogLevel){
+    subjectsGrid.style.display = 'none';
+    levelsGrid.style.display = 'grid';
+    table.style.display = 'none';
+    renderLevelsGrid();
+    document.getElementById('classesEmpty').style.display = 'none';
+    return;
+  }
+
+  subjectsGrid.style.display = 'none';
+  levelsGrid.style.display = 'none';
+  table.style.display = '';
+  const filtered = classesForSubject(catalogSubject).filter(c => levelKey(c) === catalogLevel);
+  renderClassesTable(filtered);
+}
+
+function renderBreadcrumb(){
+  const bc = document.getElementById('catalogBreadcrumb');
+  const parts = [];
+  parts.push(catalogSubject ? '<a data-nav="subjects">Toutes les matieres</a>' : '<span>Toutes les matieres</span>');
+  if (catalogSubject){
+    parts.push('›');
+    parts.push(catalogLevel ? `<a data-nav="levels">${subjectLabel(catalogSubject)}</a>` : `<span>${subjectLabel(catalogSubject)}</span>`);
+  }
+  if (catalogLevel){
+    parts.push('›');
+    parts.push(`<span>${catalogLevel}</span>`);
+  }
+  bc.innerHTML = parts.join(' ');
+  bc.querySelectorAll('a[data-nav]').forEach(a => a.addEventListener('click', () => {
+    if (a.dataset.nav === 'subjects'){ catalogSubject = null; catalogLevel = null; }
+    else if (a.dataset.nav === 'levels'){ catalogLevel = null; }
+    renderCatalog();
+  }));
+}
+
+function renderSubjectsGrid(){
+  const grid = document.getElementById('subjectsGrid');
+  grid.innerHTML = '';
+  distinctSubjects().sort((a, b) => subjectLabel(a).localeCompare(subjectLabel(b))).forEach(subject => {
+    const count = classesForSubject(subject).length;
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.innerHTML = `
+      <div class="tile-icon">${subjectIcon(subject)}</div>
+      <div class="tile-label">${subjectLabel(subject)}</div>
+      <div class="tile-count">${count} classe${count > 1 ? 's' : ''}</div>
+    `;
+    tile.addEventListener('click', () => { catalogSubject = subject; catalogLevel = null; renderCatalog(); });
+    grid.appendChild(tile);
+  });
+}
+
+function renderLevelsGrid(){
+  const grid = document.getElementById('levelsGrid');
+  grid.innerHTML = '';
+  distinctLevels(catalogSubject).sort().forEach(level => {
+    const count = classesForSubject(catalogSubject).filter(c => levelKey(c) === level).length;
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.innerHTML = `
+      <div class="tile-label">${level}</div>
+      <div class="tile-count">${count} classe${count > 1 ? 's' : ''}</div>
+    `;
+    tile.addEventListener('click', () => { catalogLevel = level; renderCatalog(); });
+    grid.appendChild(tile);
+  });
+}
+
+function renderClassesTable(list){
+  const body = document.getElementById('classesBody');
+  body.innerHTML = '';
+  document.getElementById('classesEmpty').style.display = list.length ? 'none' : 'block';
+
+  list.forEach(c => {
     const count = rosterCounts[c.id] || 0;
     const full = count >= c.capacity;
     const tr = document.createElement('tr');
@@ -368,8 +487,7 @@ function renderClassesTable(){
   });
 }
 
-document.getElementById('searchInput').addEventListener('input', renderClassesTable);
-document.getElementById('subjectFilter').addEventListener('change', renderClassesTable);
+document.getElementById('searchInput').addEventListener('input', renderCatalog);
 
 // ---------- form view (admin only) ----------
 
@@ -419,8 +537,8 @@ function collectSchedule(){
 function openNewForm(){
   editingClassId = null;
   document.getElementById('fNameInput').value = '';
-  document.getElementById('fSubjectInput').value = 'fr';
-  document.getElementById('fLevelInput').value = '';
+  document.getElementById('fSubjectInput').value = catalogSubject || 'fr';
+  document.getElementById('fLevelInput').value = (catalogLevel && catalogLevel !== 'Sans niveau') ? catalogLevel : '';
   document.getElementById('fRoomInput').value = '';
   document.getElementById('fCapacityInput').value = 12;
   populateTeacherSelect(null);
@@ -519,6 +637,25 @@ async function renderDetail(){
     actions.appendChild(toggleBtn);
   }
 
+  if (isAdmin()){
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn-sm btn-reject';
+    deleteBtn.style.background = '#8A1F13';
+    deleteBtn.textContent = 'Supprimer definitivement';
+    deleteBtn.addEventListener('click', async () => {
+      const typed = prompt(`Suppression definitive et irreversible de la classe "${c.name}" (et de toutes ses inscriptions).\n\nPour confirmer, tapez le nom exact de la classe :`);
+      if (typed !== c.name){
+        if (typed !== null) alert('Nom incorrect — suppression annulee.');
+        return;
+      }
+      const { error } = await eduflowClient.from('classes').delete().eq('id', c.id);
+      if (error){ alert('Erreur : ' + error.message); return; }
+      await loadAll();
+      showView('list');
+    });
+    actions.appendChild(deleteBtn);
+  }
+
   const { data: roster, error } = await eduflowClient
     .from('enrollments')
     .select('id, status, students(id, full_name, student_code)')
@@ -529,6 +666,18 @@ async function renderDetail(){
   list.innerHTML = '';
   const rows = error ? [] : (roster || []).filter(r => r.students);
   empty.style.display = rows.length ? 'none' : 'block';
+
+  const addBar = document.getElementById('addStudentBar');
+  if (canWrite()){
+    addBar.style.display = 'flex';
+    const enrolledIds = new Set(rows.map(r => r.students.id));
+    const available = allStudents.filter(s => !enrolledIds.has(s.id));
+    const select = document.getElementById('addStudentSelect');
+    select.innerHTML = '<option value="">— Choisir un eleve a inscrire —</option>' +
+      available.map(s => `<option value="${s.id}">${s.full_name} (${s.student_code || '—'})</option>`).join('');
+  } else {
+    addBar.style.display = 'none';
+  }
 
   rows.forEach(r => {
     const row = document.createElement('div');
@@ -553,6 +702,20 @@ async function renderDetail(){
 }
 
 document.getElementById('detailBackLink').addEventListener('click', () => showView('list'));
+
+document.getElementById('addStudentBtn').addEventListener('click', async () => {
+  const studentId = document.getElementById('addStudentSelect').value;
+  if (!studentId) return;
+  const btn = document.getElementById('addStudentBtn');
+  btn.disabled = true;
+  const { error } = await eduflowClient.from('enrollments')
+    .insert({ class_id: currentDetailClass.id, student_id: studentId, status: 'active', created_by: currentProfile.id });
+  btn.disabled = false;
+  if (error){ alert('Erreur : ' + error.message); return; }
+  await loadAll();
+  currentDetailClass = allClasses.find(x => x.id === currentDetailClass.id);
+  await renderDetail();
+});
 document.getElementById('logoutBtn').addEventListener('click', eduflowLogout);
 
 // ---------- init ----------
@@ -567,7 +730,7 @@ document.getElementById('logoutBtn').addEventListener('click', eduflowLogout);
 
   const params = new URLSearchParams(window.location.search);
   const subjectParam = params.get('subject');
-  if (subjectParam) document.getElementById('subjectFilter').value = subjectParam;
+  if (subjectParam) catalogSubject = subjectParam;
 
   document.getElementById('loadingMsg').style.display = 'none';
   document.getElementById('app').style.display = 'block';

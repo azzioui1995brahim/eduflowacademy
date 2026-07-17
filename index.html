@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edu Flow Academy — Plateforme de Test de Positionnement</title>
+<title>Edu Flow Academy — Academie de langues &amp; de formations</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
@@ -32,124 +32,10 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    padding:28px 16px 60px;
+    padding:16px 16px 0;
   }
   h1,h2,h3,.brand{font-family:'Quicksand',sans-serif;}
-  body::before{
-    content:'';position:fixed;inset:0;
-    background:url('media/logo.jpg') center 120px/620px no-repeat;
-    opacity:0.06;pointer-events:none;z-index:0;
-  }
-  .wrap, .page-wrap{width:100%;max-width:1400px;position:relative;z-index:1;}
 
-  .topbar{display:flex;align-items:center;gap:14px;width:100%;margin-bottom:8px;}
-  .logo-wrap{width:56px;height:56px;border-radius:16px;overflow:hidden;flex:none;box-shadow:0 4px 14px rgba(0,0,0,0.08);}
-  .logo-wrap img{width:100%;height:100%;object-fit:cover;}
-  .brand-name{font-weight:700;font-size:1.25rem;color:var(--ink);line-height:1.15;}
-  .brand-sub{font-size:0.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-dark);font-weight:600;}
-
-  .wave{width:100%;height:34px;margin:14px 0 18px;position:relative;overflow:hidden;}
-  .wave svg{width:200%;height:100%;animation:waveMove 9s linear infinite;}
-  @keyframes waveMove{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-  @media (prefers-reduced-motion: reduce){.wave svg{animation:none;}}
-
-  .hero{text-align:center;margin-bottom:8px;}
-  .hero h1{font-size:1.9rem;margin:0 0 10px;color:var(--ink);}
-  .hero p{color:#6B6C6E;font-size:1.02rem;line-height:1.6;margin:0 auto;max-width:520px;}
-
-  .card{
-    background:var(--card);
-    border-radius:var(--radius);
-    padding:32px 30px;
-    box-shadow:0 10px 34px rgba(30,50,60,0.08);
-    border:1px solid var(--line);
-    margin-top:24px;
-    max-width:680px;
-    margin-left:auto;
-    margin-right:auto;
-  }
-  .card + .card{margin-top:18px;}
-
-  h2{margin:0 0 6px;font-size:1.35rem;color:var(--ink);}
-  .lead{color:#7A7B7D;font-size:0.94rem;margin-bottom:22px;line-height:1.5;}
-
-  label{display:block;font-weight:600;font-size:0.85rem;margin-bottom:6px;color:var(--ink);}
-  input[type=text],input[type=number],input[type=password]{
-    width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);
-    font-size:1rem;font-family:'Inter',sans-serif;margin-bottom:18px;background:#FAFBFB;
-    transition:border-color .15s;
-  }
-  input:focus{outline:none;border-color:var(--blue);}
-  .error-msg{color:var(--danger);font-size:0.85rem;margin:-10px 0 14px;display:none;}
-
-  .subject-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
-  .subject-opt{
-    border:1.5px solid var(--line);border-radius:14px;padding:18px 14px;text-align:center;cursor:pointer;
-    transition:border-color .15s, background .15s; background:#FCFDFD;
-  }
-  .subject-opt:hover{border-color:var(--blue);}
-  .subject-opt.selected{border-color:var(--blue);background:rgba(63,174,221,0.08);}
-  .subject-opt .flag{display:flex;justify-content:center;margin-bottom:8px;}
-  .subject-opt .flag svg{width:42px;height:28px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.2);display:block;}
-  .subject-opt .label{font-weight:700;font-family:'Quicksand',sans-serif;font-size:1.02rem;}
-
-  .info-box{
-    background:#F6F8F7;border-left:4px solid var(--green);border-radius:10px;
-    padding:14px 16px;font-size:0.86rem;color:#5B5C5E;margin-bottom:20px;line-height:1.55;
-  }
-
-  button{
-    font-family:'Quicksand',sans-serif;font-weight:700;font-size:1rem;
-    border:none;border-radius:14px;padding:14px 26px;cursor:pointer;
-    transition:transform .12s ease, box-shadow .12s ease;
-  }
-  button:active{transform:scale(0.98);}
-  .btn-primary{
-    width:100%;
-    background:linear-gradient(135deg,var(--blue),var(--green));
-    color:#fff;box-shadow:0 8px 20px rgba(63,174,221,0.30);
-  }
-  .btn-primary:hover{box-shadow:0 10px 26px rgba(63,174,221,0.4);}
-
-  .admin-link{text-align:center;margin-top:20px;}
-  .admin-link a{color:#9A9B9C;font-size:0.82rem;text-decoration:none;}
-  .admin-link a:hover{color:var(--blue-dark);text-decoration:underline;}
-
-  footer.mini{margin-top:26px;font-size:0.75rem;color:#9A9B9C;text-align:center;}
-
-  .gate-screen{width:100%;max-width:420px;margin:auto;display:flex;align-items:center;justify-content:center;min-height:70vh;}
-  .gate-card{background:var(--card);border-radius:var(--radius);padding:36px 30px;box-shadow:0 10px 34px rgba(30,50,60,0.08);border:1px solid var(--line);text-align:center;width:100%;}
-  .gate-lock{font-size:2.4rem;margin-bottom:6px;}
-  .gate-card .brand-name{margin-bottom:2px;}
-  .gate-card h2{margin:14px 0 10px;}
-  .gate-lead{color:#7A7B7D;font-size:0.92rem;line-height:1.5;margin-bottom:22px;}
-  .gate-card label{text-align:left;}
-  .gate-card input{text-align:center;letter-spacing:.06em;font-weight:700;}
-
-  .gate-divider{display:flex;align-items:center;gap:12px;margin:22px 0 18px;color:#B8BCBA;font-size:0.78rem;text-transform:uppercase;letter-spacing:.06em;}
-  .gate-divider::before,.gate-divider::after{content:'';flex:1;height:1px;background:var(--line);}
-  .btn-staff{
-    display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
-    background:linear-gradient(135deg,#3A3D40,#54585C);color:#fff;text-decoration:none;
-    font-family:'Quicksand',sans-serif;font-weight:700;font-size:1rem;
-    border-radius:14px;padding:14px 26px;box-shadow:0 8px 20px rgba(30,32,34,0.25);
-  }
-  .btn-staff:hover{box-shadow:0 10px 26px rgba(30,32,34,0.35);}
-
-  .top-menu{display:flex;gap:18px;justify-content:center;margin:0 0 18px;font-size:0.85rem;}
-  .top-menu a{color:#7A7B7D;text-decoration:none;font-weight:600;padding:6px 4px;}
-  .top-menu a:hover{color:var(--blue-dark);}
-
-  .pwd-field{position:relative;}
-  .pwd-field input{padding-right:44px;}
-  .pwd-toggle{
-    position:absolute;right:6px;top:50%;transform:translateY(-50%);
-    background:none;border:none;cursor:pointer;font-size:1.05rem;padding:6px 8px;
-    line-height:1;border-radius:8px;
-  }
-  .pwd-toggle:hover{background:#F0F3F2;}
-
-  /* ---- Public homepage shell: sticky top navbar + full-width page ---- */
   .page-wrap{width:100%;max-width:1400px;}
 
   .navbar{
@@ -193,7 +79,7 @@
   .btn-primary-lg{
     font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.96rem;text-decoration:none;
     background:linear-gradient(135deg,var(--blue),var(--green));color:#fff;
-    padding:14px 26px;border-radius:14px;box-shadow:0 8px 20px rgba(63,174,221,0.30);display:inline-block;
+    padding:14px 26px;border-radius:14px;box-shadow:0 8px 20px rgba(63,174,221,0.30);display:inline-block;border:none;cursor:pointer;
   }
   .btn-primary-lg:hover{box-shadow:0 10px 26px rgba(63,174,221,0.4);}
   .btn-secondary-lg{
@@ -240,6 +126,16 @@
   }
   .section-title{font-size:1.35rem;margin:6px 0 6px;text-align:center;}
   .section-sub{color:#7A7B7D;font-size:0.9rem;text-align:center;margin-bottom:26px;}
+
+  /* ---- Why choose us / trust cards ---- */
+  .trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  @media (max-width:860px){.trust-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:520px){.trust-grid{grid-template-columns:1fr;}}
+  .trust-card{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:24px 18px;text-align:center;box-shadow:0 6px 16px rgba(30,50,60,0.05);transition:transform .15s ease, box-shadow .15s ease;}
+  .trust-card:hover{transform:translateY(-4px);box-shadow:0 14px 28px rgba(30,50,60,0.09);}
+  .trust-icon{font-size:1.6rem;width:48px;height:48px;border-radius:12px;background:rgba(123,196,107,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+  .trust-card h3{margin:0 0 6px;font-size:0.98rem;}
+  .trust-card p{margin:0;color:#7A7B7D;font-size:0.82rem;line-height:1.45;}
 
   .programs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
   @media (max-width:860px){.programs-grid{grid-template-columns:1fr;}}
@@ -323,6 +219,22 @@
 
   .qr-section{text-align:center;margin-top:36px;}
   .qr-section img{width:130px;height:130px;border-radius:14px;border:1.5px solid var(--line);padding:8px;background:#fff;}
+
+  /* ---- Footer ---- */
+  .site-footer{width:100%;margin-top:50px;border-top:1.5px solid var(--line);padding:36px 12px 22px;}
+  .footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px;}
+  @media (max-width:760px){.footer-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:480px){.footer-grid{grid-template-columns:1fr;}}
+  .footer-brand{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .footer-brand img{width:38px;height:38px;border-radius:10px;object-fit:cover;}
+  .footer-brand-name{font-weight:700;font-size:1rem;color:var(--ink);}
+  .footer-desc{color:#8A8B8D;font-size:0.84rem;line-height:1.6;max-width:280px;margin:0;}
+  .footer-col h4{font-family:'Quicksand',sans-serif;font-size:0.86rem;margin:0 0 12px;color:var(--ink);}
+  .footer-col ul{list-style:none;margin:0;padding:0;}
+  .footer-col li{margin-bottom:9px;}
+  .footer-col a{color:#7A7B7D;text-decoration:none;font-size:0.85rem;}
+  .footer-col a:hover{color:var(--blue-dark);}
+  .footer-bottom{max-width:1400px;margin:30px auto 0;padding-top:18px;border-top:1px solid var(--line);text-align:center;color:#9A9B9C;font-size:0.78rem;}
 </style>
 </head>
 <body>
@@ -331,22 +243,21 @@
   <nav class="navbar">
     <div class="navbar-inner">
       <div class="navbar-brand">
-        <img id="sidebarLogoImg" alt="Edu Flow Academy" onerror="this.style.display='none';">
+        <img id="navbarLogoImg" src="media/logo.jpg" alt="Edu Flow Academy" onerror="this.style.display='none';">
         <span class="navbar-brand-name">Edu Flow Academy</span>
       </div>
       <div class="navbar-links">
-        <a href="#" class="navbar-link active" id="navHomeLink">Accueil</a>
+        <a href="index.html" class="navbar-link active">Accueil</a>
         <a href="#programs" class="navbar-link">Programmes</a>
         <a href="#contact" class="navbar-link">Contact</a>
         <a href="login.html" class="navbar-link">Espace personnel</a>
       </div>
-      <a href="#" class="btn-navbar-cta js-start-test">Passer le test 🚀</a>
+      <a href="test-entry.html" class="btn-navbar-cta">Passer le test 🚀</a>
     </div>
   </nav>
 
   <main>
 
-  <div id="homeView">
     <section class="hero-section">
       <div class="hero-grid">
         <div class="hero-copy">
@@ -354,7 +265,7 @@
           <h1>Apprenez, progressez,<br>avec de <span class="hero-highlight">vrais experts</span>.</h1>
           <p>Edu Flow Academy est une academie complete : cours de langues, formations professionnelles et accompagnement educatif, dispenses par de vrais formateurs — pas juste une plateforme de tests. Le test de positionnement gratuit n'est que la premiere etape pour rejoindre la classe qui vous correspond, enfants comme adultes.</p>
           <div class="hero-actions">
-            <a href="#" class="btn-primary-lg js-start-test">Commencer mon test 🚀</a>
+            <a href="test-entry.html" class="btn-primary-lg">Commencer mon test 🚀</a>
             <a href="#programs" class="btn-secondary-lg">Voir les programmes</a>
           </div>
           <div class="hero-stats">
@@ -365,7 +276,7 @@
         </div>
         <div class="hero-visual">
           <div class="hero-visual-card">
-            <img id="heroLogoImg" class="hero-visual-logo" alt="Edu Flow Academy" onerror="this.style.display='none';">
+            <img id="heroLogoImg" class="hero-visual-logo" src="media/logo.jpg" alt="Edu Flow Academy" onerror="this.style.display='none';">
             <div class="hero-visual-emoji">🌍</div>
             <div class="hero-visual-row"><span>🇫🇷</span><span>🇬🇧</span><span>🇪🇸</span><span>🇩🇪</span></div>
             <div class="hero-visual-sub">4 langues, tous niveaux</div>
@@ -381,6 +292,32 @@
       <div class="value-pill">💼 Formations professionnelles</div>
       <div class="value-pill">🧩 Accompagnement educatif</div>
       <div class="value-pill">📈 Test de positionnement automatique</div>
+    </div>
+
+    <span class="eyebrow-tag">Pourquoi nous choisir</span>
+    <h2 class="section-title">Une academie pensee pour votre progression</h2>
+    <p class="section-sub">Ce qui distingue Edu Flow Academy au quotidien.</p>
+    <div class="trust-grid">
+      <div class="trust-card">
+        <div class="trust-icon">🧑‍🏫</div>
+        <h3>Vrais formateurs</h3>
+        <p>Des enseignants et specialistes qualifies, pas une plateforme automatisee.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">🎯</div>
+        <h3>Niveau evalue des le depart</h3>
+        <p>Un test de positionnement gratuit pour rejoindre directement la bonne classe.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">🧩</div>
+        <h3>Suivi personnalise</h3>
+        <p>Un accompagnement adapte a chaque eleve, enfant comme adulte.</p>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">📍</div>
+        <h3>Un seul campus, Casablanca</h3>
+        <p>Cours en presentiel, dans un cadre pedagogique dedie.</p>
+      </div>
     </div>
 
     <span class="eyebrow-tag" id="programs">Nos formations</span>
@@ -529,185 +466,51 @@
     <section class="cta-banner">
       <h2>Pret a decouvrir votre niveau ?</h2>
       <p>Le test de positionnement est gratuit et ne prend que quelques minutes.</p>
-      <a href="#" class="btn-primary-lg js-start-test">Commencer maintenant 🚀</a>
+      <a href="test-entry.html" class="btn-primary-lg">Commencer maintenant 🚀</a>
     </section>
 
-    <footer class="mini">Edu Flow Academy — Plateforme d'evaluation linguistique</footer>
-  </div>
-
-  <div id="gateScreen" class="gate-screen" style="display:none;">
-    <div class="gate-card">
-      <div class="gate-lock">🔒</div>
-      <div class="brand-name">Edu Flow Academy</div>
-      <h2>Acces reserve</h2>
-      <p class="gate-lead">Cette plateforme est reservee aux eleves et au personnel de Edu Flow Academy. Merci de saisir le code d'acces fourni par l'academie.</p>
-      <label for="gateCodeInput">Code d'acces</label>
-      <div class="pwd-field">
-        <input type="password" id="gateCodeInput" placeholder="Ex. : EFA-XXXXXX" autocomplete="off" data-lpignore="true" data-1p-ignore data-bwignore="true" data-form-type="other">
-        <button type="button" class="pwd-toggle" id="gateCodeToggle" aria-label="Afficher/masquer le code">👁️</button>
-      </div>
-      <div class="error-msg" id="gateError">Code incorrect. Merci de reessayer.</div>
-      <button class="btn-primary" id="gateBtn">Valider</button>
-    </div>
-  </div>
-
-  <div class="wrap" id="appContent" style="display:none;">
-    <div class="topbar">
-      <div class="logo-wrap"><img src="media/logo.jpg" alt="Edu Flow Academy" onerror="this.style.display='none';"></div>
-      <div>
-        <div class="brand-name">Edu Flow Academy</div>
-        <div class="brand-sub">Plateforme de test de positionnement</div>
-      </div>
-    </div>
-
-    <div class="wave">
-      <svg viewBox="0 0 800 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 20 Q 50 0 100 20 T 200 20 T 300 20 T 400 20 T 500 20 T 600 20 T 700 20 T 800 20 L800 40 L0 40 Z" fill="url(#g1)"/>
-        <path d="M800 20 Q 850 0 900 20 T 1000 20 T 1100 20 T 1200 20 T 1300 20 T 1400 20 T 1500 20 T 1600 20 L1600 40 L800 40 Z" fill="url(#g1)"/>
-        <defs>
-          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stop-color="#7BC46B"/>
-            <stop offset="1" stop-color="#3FAEDD"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
-
-    <div class="hero">
-      <h1>Bienvenue a Edu Flow Academy ! 👋</h1>
-      <p>Decouvrez votre niveau en francais ou en anglais en quelques minutes. Remplissez vos informations ci-dessous et nous vous dirigeons automatiquement vers le test qui vous correspond.</p>
-    </div>
-
-    <div class="card">
-      <h2>Commencer mon test</h2>
-      <p class="lead">Ces informations nous permettent de vous proposer le bon test et de generer votre rapport personnalise.</p>
-
-      <label for="nameInput">Prenom et nom</label>
-      <input type="text" id="nameInput" placeholder="Ex. : Sara El Amrani">
-      <div class="error-msg" id="errName">Merci d'indiquer votre nom.</div>
-
-      <label for="ageInput">Age</label>
-      <input type="number" id="ageInput" min="5" max="99" placeholder="Ex. : 16">
-      <div class="error-msg" id="errAge">Merci d'indiquer un age valide (entre 5 et 99 ans).</div>
-
-      <label>Quelle langue souhaitez-vous evaluer ?</label>
-      <div class="subject-grid" id="subjectGrid">
-        <div class="subject-opt" data-subject="fr">
-          <span class="flag"><svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="2" fill="#0055A4"/><rect x="1" width="1" height="2" fill="#FFFFFF"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg></span>
-          <span class="label">Francais</span>
-        </div>
-        <div class="subject-opt" data-subject="en">
-          <span class="flag"><svg viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="30" fill="#00247d"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#cf142b" stroke-width="2"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#cf142b" stroke-width="6"/></svg></span>
-          <span class="label">English</span>
-        </div>
-      </div>
-      <div class="error-msg" id="errSubject">Merci de choisir une langue.</div>
-
-      <div class="info-box">
-        <strong>Comment ca marche :</strong> les eleves de <strong>12 ans ou moins</strong> recoivent automatiquement notre test <strong>Junior</strong>, plus court et adapte aux plus jeunes. Les eleves de <strong>13 ans et plus</strong> recoivent le test <strong>complet (100 questions)</strong>, du niveau A1 a B1/B2.
-      </div>
-
-      <button class="btn-primary" id="btnGo">Commencer le test 🚀</button>
-    </div>
-
-    <footer class="mini">Edu Flow Academy — Plateforme d'evaluation linguistique</footer>
-  </div>
-
   </main>
+
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">
+          <img src="media/logo.jpg" alt="Edu Flow Academy" onerror="this.style.display='none';">
+          <span class="footer-brand-name">Edu Flow Academy</span>
+        </div>
+        <p class="footer-desc">Academie de langues, de formations professionnelles et d'accompagnement educatif a Casablanca.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="#programs">Programmes</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="test-entry.html">Passer le test</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Programmes</h4>
+        <ul>
+          <li><a href="#programs">Langues</a></li>
+          <li><a href="#programs">Formation professionnelle</a></li>
+          <li><a href="#programs">Accompagnement educatif</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:0521406510">0521406510</a></li>
+          <li><a href="https://www.facebook.com/share/19Ax56susQ/?mibextid=wwXIfr" target="_blank" rel="noopener">Facebook</a></li>
+          <li><a href="https://www.instagram.com/edu.flow.academy?igsh=MW1zbm4zbDlyMnNxaw==" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="login.html">Espace personnel</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+  <div class="footer-bottom">Edu Flow Academy — Plateforme d'evaluation linguistique</div>
+
 </div>
-
-<script>
-const PLATFORM_CODE = 'EFA-7M9HYX';
-
-// Reuse the logo image already embedded in the topbar below, instead of duplicating that data.
-document.getElementById('heroLogoImg').src = document.querySelector('.topbar .logo-wrap img').src;
-document.getElementById('sidebarLogoImg').src = document.querySelector('.topbar .logo-wrap img').src;
-
-function showHome(){
-  document.getElementById('homeView').style.display = 'block';
-  document.getElementById('gateScreen').style.display = 'none';
-  document.getElementById('appContent').style.display = 'none';
-}
-function showGate(){
-  document.getElementById('homeView').style.display = 'none';
-  document.getElementById('gateScreen').style.display = 'flex';
-}
-function showApp(){
-  document.getElementById('homeView').style.display = 'none';
-  document.getElementById('gateScreen').style.display = 'none';
-  document.getElementById('appContent').style.display = 'block';
-}
-
-document.getElementById('navHomeLink').addEventListener('click', (e)=>{ e.preventDefault(); showHome(); });
-document.querySelectorAll('.js-start-test').forEach(el => {
-  el.addEventListener('click', (e)=>{ e.preventDefault(); showGate(); });
-});
-
-if(sessionStorage.getItem('eduflow_platform_unlocked') === '1'){ showApp(); }
-
-function tryUnlockPlatform(){
-  const input = document.getElementById('gateCodeInput');
-  const err = document.getElementById('gateError');
-  const val = input.value.trim().toUpperCase();
-  if(val === PLATFORM_CODE){
-    try{ sessionStorage.setItem('eduflow_platform_unlocked', '1'); }catch(e){}
-    err.style.display = 'none';
-    showApp();
-  } else {
-    err.style.display = 'block';
-  }
-}
-document.getElementById('gateBtn').addEventListener('click', tryUnlockPlatform);
-document.getElementById('gateCodeInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryUnlockPlatform(); });
-document.getElementById('gateCodeToggle').addEventListener('click', ()=>{
-  const input = document.getElementById('gateCodeInput');
-  const btn = document.getElementById('gateCodeToggle');
-  const showing = input.type === 'text';
-  input.type = showing ? 'password' : 'text';
-  btn.textContent = showing ? '👁️' : '🙈';
-});
-
-let selectedSubject = null;
-document.getElementById('subjectGrid').addEventListener('click', (e)=>{
-  const opt = e.target.closest('.subject-opt');
-  if(!opt) return;
-  document.querySelectorAll('.subject-opt').forEach(o=>o.classList.remove('selected'));
-  opt.classList.add('selected');
-  selectedSubject = opt.dataset.subject;
-  document.getElementById('errSubject').style.display = 'none';
-});
-
-document.getElementById('btnGo').addEventListener('click', ()=>{
-  const nameEl = document.getElementById('nameInput');
-  const ageEl = document.getElementById('ageInput');
-  const errName = document.getElementById('errName');
-  const errAge = document.getElementById('errAge');
-  const errSubject = document.getElementById('errSubject');
-
-  let ok = true;
-  const name = nameEl.value.trim();
-  if(!name){ errName.style.display='block'; ok=false; } else { errName.style.display='none'; }
-
-  const age = parseInt(ageEl.value, 10);
-  if(!age || age < 5 || age > 99){ errAge.style.display='block'; ok=false; } else { errAge.style.display='none'; }
-
-  if(!selectedSubject){ errSubject.style.display='block'; ok=false; }
-
-  if(!ok) return;
-
-  const student = { name: name, age: age, subject: selectedSubject, timestamp: new Date().toISOString() };
-  try{ localStorage.setItem('eduflow_current_student', JSON.stringify(student)); }catch(e){}
-
-  const isJunior = age <= 12;
-  let target;
-  if(selectedSubject === 'fr'){
-    target = isJunior ? 'test-fr-junior.html' : 'test-fr-full.html';
-  } else {
-    target = isJunior ? 'test-en-junior.html' : 'test-en-full.html';
-  }
-  window.location.href = target;
-});
-</script>
 
 </body>
 </html>
