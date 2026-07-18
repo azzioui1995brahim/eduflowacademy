@@ -45,7 +45,7 @@
     box-shadow:0 8px 24px rgba(30,50,60,0.08);
     margin-bottom:8px;
   }
-  .navbar-inner{display:flex;align-items:center;gap:18px;padding:10px 18px;}
+  .navbar-inner{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;padding:10px 18px;}
   .navbar-brand{display:flex;align-items:center;gap:10px;flex:none;}
   .navbar-brand img{width:36px;height:36px;border-radius:9px;object-fit:cover;}
   .navbar-brand-name{font-weight:700;font-size:1rem;color:var(--ink);}
@@ -56,6 +56,13 @@
   }
   .navbar-link:hover{background:#F0F3F2;color:var(--ink);}
   .navbar-link.active{color:var(--blue-dark);}
+  .navbar-cta-group{display:flex;align-items:center;gap:10px;flex:none;}
+  .btn-navbar-outline{
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.86rem;
+    background:#fff;color:var(--ink);border:1.5px solid var(--line);text-decoration:none;
+    padding:9px 17px;border-radius:12px;
+  }
+  .btn-navbar-outline:hover{border-color:var(--blue);color:var(--blue-dark);}
   .btn-navbar-cta{
     flex:none;font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.86rem;
     background:linear-gradient(135deg,var(--blue),var(--green));color:#fff;text-decoration:none;
@@ -65,17 +72,40 @@
   @media (max-width:760px){.navbar-links{order:3;width:100%;justify-content:center;}}
 
   /* ---- Hero ---- */
-  .hero-section{padding:44px 12px 20px;}
+  .hero-section{
+    padding:44px 24px 34px;position:relative;overflow:hidden;
+    border-radius:28px;isolation:isolate;
+  }
+  .hero-section::before{
+    content:'';position:absolute;inset:0;z-index:-1;
+    background:
+      linear-gradient(100deg, var(--bg) 0%, rgba(238,241,240,0.94) 38%, rgba(63,174,221,0.30) 78%, rgba(123,196,107,0.34) 100%),
+      url('https://images.unsplash.com/photo-1777186475838-9c94498b7ff4?q=80&w=1600&auto=format&fit=crop') center 30%/cover no-repeat;
+  }
   .hero-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:40px;align-items:center;}
   @media (max-width:860px){.hero-grid{grid-template-columns:1fr;}}
   .hero-eyebrow{
     display:inline-flex;align-items:center;gap:6px;background:rgba(123,196,107,0.14);color:var(--green-dark);
     font-weight:700;font-size:0.8rem;padding:6px 14px;border-radius:999px;margin-bottom:16px;
   }
-  .hero-copy h1{font-size:2.3rem;line-height:1.18;margin:0 0 16px;}
+  .hero-copy h1{font-size:clamp(2.1rem,4.4vw,3.1rem);line-height:1.1;margin:0 0 18px;letter-spacing:-0.01em;}
   .hero-highlight{background:linear-gradient(135deg,var(--blue),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent;}
   .hero-copy p{color:#6B6C6E;font-size:1.02rem;line-height:1.6;max-width:480px;margin:0 0 26px;}
-  .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:30px;}
+  .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px;}
+  .hero-search{
+    display:flex;gap:8px;background:#fff;border:1.5px solid var(--line);border-radius:16px;
+    padding:6px;max-width:480px;margin:0 0 30px;box-shadow:0 8px 20px rgba(30,50,60,0.06);
+  }
+  .hero-search input{
+    flex:1;border:none;background:transparent;padding:10px 12px;font-family:'Inter',sans-serif;
+    font-size:0.92rem;color:var(--ink);min-width:0;
+  }
+  .hero-search input:focus{outline:none;}
+  .hero-search button{
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.86rem;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--blue),var(--green));color:#fff;padding:10px 20px;border-radius:11px;
+    display:flex;align-items:center;gap:6px;flex:none;
+  }
   .btn-primary-lg{
     font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.96rem;text-decoration:none;
     background:linear-gradient(135deg,var(--blue),var(--green));color:#fff;
@@ -99,8 +129,9 @@
     box-shadow:0 20px 50px rgba(30,50,60,0.12);position:relative;
   }
   .hero-visual-logo{width:52px;height:52px;border-radius:14px;object-fit:cover;margin:0 auto 14px;display:block;box-shadow:0 6px 16px rgba(0,0,0,0.12);}
-  .hero-visual-emoji{font-size:2.6rem;margin-bottom:6px;}
-  .hero-visual-row{display:flex;justify-content:center;gap:10px;font-size:1.6rem;margin:10px 0;}
+  .hero-visual-photo{width:100%;max-width:220px;height:110px;border-radius:14px;object-fit:cover;margin:0 auto 6px;display:block;box-shadow:0 6px 16px rgba(0,0,0,0.14);}
+  .hero-visual-row{display:flex;justify-content:center;align-items:center;gap:10px;margin:12px 0;}
+  .hero-flag{width:30px;height:20px;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.22);display:block;}
   .hero-visual-sub{color:#7A7B7D;font-size:0.86rem;font-weight:600;}
   .hero-badge{
     position:absolute;background:#fff;border:1px solid var(--line);border-radius:14px;
@@ -109,8 +140,30 @@
   }
   .hero-badge span{display:block;font-weight:500;color:#8A8B8D;font-size:0.72rem;}
   .hero-badge-1{top:6%;left:-4%;}
-  .hero-badge-2{bottom:8%;right:-6%;}
-  @media (max-width:500px){.hero-badge{display:none;}}
+  .hero-badge-2{bottom:8%;right:-6%;display:flex;align-items:center;gap:10px;padding:12px 16px;}
+  .hero-badge-icon{
+    width:38px;height:38px;border-radius:11px;background:rgba(123,196,107,0.14);color:var(--green-dark);
+    display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex:none;
+  }
+  .hero-badge-2 strong{display:block;font-family:'Quicksand',sans-serif;font-size:1.15rem;color:var(--ink);line-height:1.1;}
+  @media (max-width:500px){.hero-badge{display:none !important;}}
+
+  /* ---- Stats strip ---- */
+  .stats-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:6px 12px 34px;}
+  @media (max-width:700px){.stats-strip{grid-template-columns:1fr;}}
+  .stat-card{
+    background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:22px 20px;
+    display:flex;align-items:center;gap:16px;box-shadow:0 8px 20px rgba(30,50,60,0.05);
+  }
+  .stat-card .stat-icon{
+    width:50px;height:50px;border-radius:14px;flex:none;font-size:1.4rem;
+    background:linear-gradient(135deg,rgba(63,174,221,0.14),rgba(123,196,107,0.14));
+    display:flex;align-items:center;justify-content:center;
+  }
+  .stat-card strong{display:block;font-family:'Quicksand',sans-serif;font-size:1.6rem;color:var(--ink);line-height:1.1;}
+  .stat-card span{color:#8A8B8D;font-size:0.82rem;}
+
+  .search-match{outline:2.5px solid var(--blue);outline-offset:2px;}
 
   /* ---- Value / feature pill strip ---- */
   .value-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;padding:18px 12px 30px;}
@@ -134,6 +187,11 @@
   .trust-card{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:24px 18px;text-align:center;box-shadow:0 6px 16px rgba(30,50,60,0.05);transition:transform .15s ease, box-shadow .15s ease;}
   .trust-card:hover{transform:translateY(-4px);box-shadow:0 14px 28px rgba(30,50,60,0.09);}
   .trust-icon{font-size:1.6rem;width:48px;height:48px;border-radius:12px;background:rgba(123,196,107,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+  .trust-num{
+    font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.78rem;color:var(--blue-dark);
+    background:rgba(63,174,221,0.10);width:34px;height:34px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 12px;
+  }
   .trust-card h3{margin:0 0 6px;font-size:0.98rem;}
   .trust-card p{margin:0;color:#7A7B7D;font-size:0.82rem;line-height:1.45;}
 
@@ -141,14 +199,19 @@
   @media (max-width:860px){.programs-grid{grid-template-columns:1fr;}}
   .program-card{
     background:var(--card);border-radius:var(--radius);border:1.5px solid var(--line);
-    padding:26px 22px;box-shadow:0 8px 20px rgba(30,50,60,0.06);
+    overflow:hidden;box-shadow:0 8px 20px rgba(30,50,60,0.06);
     transition:transform .15s ease, box-shadow .15s ease;
   }
   .program-card:hover{transform:translateY(-4px);box-shadow:0 16px 32px rgba(30,50,60,0.10);}
-  .program-card .program-icon{
-    font-size:1.7rem;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-    background:rgba(63,174,221,0.10);margin-bottom:14px;
+  .program-banner{
+    background:linear-gradient(135deg,var(--blue),var(--green));padding:26px 22px 34px;
+    display:flex;align-items:center;justify-content:center;
   }
+  .program-card .program-icon{
+    font-size:1.9rem;width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,0.24);
+  }
+  .program-card .program-body{padding:22px;margin-top:-16px;background:var(--card);border-radius:18px 18px 0 0;position:relative;}
   .program-card h3{margin:0 0 8px;font-size:1.08rem;}
   .program-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
   .program-tag{
@@ -250,9 +313,11 @@
         <a href="index.html" class="navbar-link active">Accueil</a>
         <a href="#programs" class="navbar-link">Programmes</a>
         <a href="#contact" class="navbar-link">Contact</a>
-        <a href="login.html" class="navbar-link">Espace personnel</a>
       </div>
-      <a href="test-entry.html" class="btn-navbar-cta">Passer le test 🚀</a>
+      <div class="navbar-cta-group">
+        <a href="login.html" class="btn-navbar-outline">Espace personnel</a>
+        <a href="test-entry.html" class="btn-navbar-cta">Passer le test 🚀</a>
+      </div>
     </div>
   </nav>
 
@@ -268,24 +333,34 @@
             <a href="test-entry.html" class="btn-primary-lg">Commencer mon test 🚀</a>
             <a href="#programs" class="btn-secondary-lg">Voir les programmes</a>
           </div>
-          <div class="hero-stats">
-            <div class="hero-stat"><strong>3</strong><span>domaines de formation</span></div>
-            <div class="hero-stat"><strong>4</strong><span>langues enseignees</span></div>
-            <div class="hero-stat"><strong>100%</strong><span>suivi personnalise</span></div>
-          </div>
+          <form class="hero-search" id="heroSearchForm">
+            <input type="text" id="heroSearchInput" placeholder="Rechercher une langue ou une formation...">
+            <button type="submit">🔍 Rechercher</button>
+          </form>
         </div>
         <div class="hero-visual">
           <div class="hero-visual-card">
             <img id="heroLogoImg" class="hero-visual-logo" src="media/logo.jpg" alt="Edu Flow Academy" onerror="this.style.display='none';">
-            <div class="hero-visual-emoji">🌍</div>
-            <div class="hero-visual-row"><span>🇫🇷</span><span>🇬🇧</span><span>🇪🇸</span><span>🇩🇪</span></div>
+            <img class="hero-visual-photo" src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&amp;w=440&amp;auto=format&amp;fit=crop" alt="Formation et education">
+            <div class="hero-visual-row">
+              <svg class="hero-flag" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="2" fill="#0055A4"/><rect x="1" width="1" height="2" fill="#FFFFFF"/><rect x="2" width="1" height="2" fill="#EF4135"/></svg>
+              <svg class="hero-flag" viewBox="0 0 60 30" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="30" fill="#00247d"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#cf142b" stroke-width="2"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#cf142b" stroke-width="6"/></svg>
+              <svg class="hero-flag" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#AA151B"/><rect y="0.5" width="3" height="1" fill="#F1BF00"/></svg>
+              <svg class="hero-flag" viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="0.667" fill="#000000"/><rect y="0.667" width="3" height="0.667" fill="#DD0000"/><rect y="1.333" width="3" height="0.667" fill="#FFCE00"/></svg>
+            </div>
             <div class="hero-visual-sub">4 langues, tous niveaux</div>
           </div>
           <div class="hero-badge hero-badge-1">✅ Test adapte<span>20 a 45 min selon l'age</span></div>
-          <div class="hero-badge hero-badge-2">🧑‍🏫 Suivi<span>personnalise</span></div>
+          <div class="hero-badge hero-badge-2"><span class="hero-badge-icon">🧑‍🏫</span><div><strong>100%</strong><span>suivi personnalise</span></div></div>
         </div>
       </div>
     </section>
+
+    <div class="stats-strip">
+      <div class="stat-card"><div class="stat-icon">🎓</div><div><strong>3</strong><span>domaines de formation</span></div></div>
+      <div class="stat-card"><div class="stat-icon">🌍</div><div><strong>4</strong><span>langues enseignees</span></div></div>
+      <div class="stat-card"><div class="stat-icon">🧑‍🏫</div><div><strong>100%</strong><span>suivi personnalise</span></div></div>
+    </div>
 
     <div class="value-strip">
       <div class="value-pill">🌍 Langues pour tous niveaux</div>
@@ -299,23 +374,23 @@
     <p class="section-sub">Ce qui distingue Edu Flow Academy au quotidien.</p>
     <div class="trust-grid">
       <div class="trust-card">
-        <div class="trust-icon">🧑‍🏫</div>
-        <h3>Vrais formateurs</h3>
+        <div class="trust-num">01</div>
+        <h3>🧑‍🏫 Vrais formateurs</h3>
         <p>Des enseignants et specialistes qualifies, pas une plateforme automatisee.</p>
       </div>
       <div class="trust-card">
-        <div class="trust-icon">🎯</div>
-        <h3>Niveau evalue des le depart</h3>
+        <div class="trust-num">02</div>
+        <h3>🎯 Niveau evalue des le depart</h3>
         <p>Un test de positionnement gratuit pour rejoindre directement la bonne classe.</p>
       </div>
       <div class="trust-card">
-        <div class="trust-icon">🧩</div>
-        <h3>Suivi personnalise</h3>
+        <div class="trust-num">03</div>
+        <h3>🧩 Suivi personnalise</h3>
         <p>Un accompagnement adapte a chaque eleve, enfant comme adulte.</p>
       </div>
       <div class="trust-card">
-        <div class="trust-icon">📍</div>
-        <h3>Un seul campus, Casablanca</h3>
+        <div class="trust-num">04</div>
+        <h3>📍 Un seul campus, Casablanca</h3>
         <p>Cours en presentiel, dans un cadre pedagogique dedie.</p>
       </div>
     </div>
@@ -325,44 +400,50 @@
     <p class="section-sub">Trois domaines, un seul objectif : vous accompagner a chaque etape.</p>
     <div class="programs-grid">
       <div class="program-card">
-        <div class="program-icon">🌍</div>
-        <h3>Langues</h3>
-        <p class="lead" style="margin:0;">Cours de langues pour tous les niveaux.</p>
-        <div class="program-tags">
-          <span class="program-tag">Anglais</span>
-          <span class="program-tag">Francais</span>
-          <span class="program-tag">Espagnol</span>
-          <span class="program-tag">Allemand</span>
-          <span class="program-tag">Selectividad</span>
+        <div class="program-banner"><div class="program-icon">🌍</div></div>
+        <div class="program-body">
+          <h3>Langues</h3>
+          <p class="lead" style="margin:0;">Cours de langues pour tous les niveaux.</p>
+          <div class="program-tags">
+            <span class="program-tag">Anglais</span>
+            <span class="program-tag">Francais</span>
+            <span class="program-tag">Espagnol</span>
+            <span class="program-tag">Allemand</span>
+            <span class="program-tag">Selectividad</span>
+          </div>
         </div>
       </div>
       <div class="program-card">
-        <div class="program-icon">💼</div>
-        <h3>Formation professionnelle</h3>
-        <p class="lead" style="margin:0;">Developpez de nouvelles competences.</p>
-        <div class="program-tags">
-          <span class="program-tag">Drone</span>
-          <span class="program-tag">IA</span>
-          <span class="program-tag">Infographie</span>
-          <span class="program-tag">E-commerce</span>
-          <span class="program-tag">Marketing digital</span>
-          <span class="program-tag">Bureautique</span>
-          <span class="program-tag">Secourisme</span>
-          <span class="program-tag">Education sportive</span>
-          <span class="program-tag">Assistante medicale</span>
+        <div class="program-banner"><div class="program-icon">💼</div></div>
+        <div class="program-body">
+          <h3>Formation professionnelle</h3>
+          <p class="lead" style="margin:0;">Developpez de nouvelles competences.</p>
+          <div class="program-tags">
+            <span class="program-tag">Drone</span>
+            <span class="program-tag">IA</span>
+            <span class="program-tag">Infographie</span>
+            <span class="program-tag">E-commerce</span>
+            <span class="program-tag">Marketing digital</span>
+            <span class="program-tag">Bureautique</span>
+            <span class="program-tag">Secourisme</span>
+            <span class="program-tag">Education sportive</span>
+            <span class="program-tag">Assistante medicale</span>
+          </div>
         </div>
       </div>
       <div class="program-card">
-        <div class="program-icon">🧩</div>
-        <h3>Accompagnement educatif &amp; therapie</h3>
-        <p class="lead" style="margin:0;">Un suivi adapte a chaque enfant.</p>
-        <div class="program-tags">
-          <span class="program-tag">Psychomotricite</span>
-          <span class="program-tag">Psychologue</span>
-          <span class="program-tag">Orthophoniste</span>
-          <span class="program-tag">Educatrice specialisee</span>
-          <span class="program-tag">Enfants autistes</span>
-          <span class="program-tag">Enfants trisomiques</span>
+        <div class="program-banner"><div class="program-icon">🧩</div></div>
+        <div class="program-body">
+          <h3>Accompagnement educatif &amp; therapie</h3>
+          <p class="lead" style="margin:0;">Un suivi adapte a chaque enfant.</p>
+          <div class="program-tags">
+            <span class="program-tag">Psychomotricite</span>
+            <span class="program-tag">Psychologue</span>
+            <span class="program-tag">Orthophoniste</span>
+            <span class="program-tag">Educatrice specialisee</span>
+            <span class="program-tag">Enfants autistes</span>
+            <span class="program-tag">Enfants trisomiques</span>
+          </div>
         </div>
       </div>
     </div>
@@ -511,6 +592,31 @@
   <div class="footer-bottom">Edu Flow Academy — Plateforme d'evaluation linguistique</div>
 
 </div>
+
+<script>
+document.getElementById('heroSearchForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const q = document.getElementById('heroSearchInput').value.trim().toLowerCase();
+
+  document.querySelectorAll('.search-match').forEach(el => el.classList.remove('search-match'));
+
+  if (!q){
+    document.getElementById('programs').scrollIntoView({ behavior:'smooth' });
+    return;
+  }
+
+  let firstMatch = null;
+  document.querySelectorAll('.program-card, .lang-card').forEach(card => {
+    if (card.textContent.toLowerCase().includes(q)){
+      card.classList.add('search-match');
+      if (!firstMatch) firstMatch = card;
+    }
+  });
+
+  const target = firstMatch || document.getElementById('programs');
+  target.scrollIntoView({ behavior:'smooth', block:'center' });
+});
+</script>
 
 </body>
 </html>

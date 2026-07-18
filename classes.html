@@ -127,6 +127,9 @@
   }
   .tile .tile-label{font-weight:700;font-family:'Quicksand',sans-serif;font-size:0.92rem;}
   .tile .tile-count{color:#9A9B9C;font-size:0.76rem;margin-top:4px;}
+  .tile .tile-sub{color:#9A9B9C;font-size:0.74rem;margin-top:2px;}
+  .tile .tile-status{display:inline-block;margin-top:8px;}
+  .tile.cap-full .tile-count{color:var(--danger);font-weight:700;}
 
   .schedule-slot{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
   .schedule-slot select{min-width:110px;}
@@ -166,15 +169,13 @@
         <button class="btn-sm btn-primary-sm" id="newClassBtn" style="display:none;">+ Nouvelle classe</button>
         <button class="btn-sm btn-ghost-sm" id="printListBtn">🖨️ Imprimer</button>
       </div>
-      <div class="catalog-breadcrumb no-print" id="catalogBreadcrumb"></div>
-      <div class="tile-grid" id="subjectsGrid"></div>
-      <div class="tile-grid" id="levelsGrid" style="display:none;"></div>
-      <table class="data-table" id="classesTable" style="display:none;">
-        <thead>
-          <tr><th>Nom</th><th>Matiere</th><th>Niveau</th><th>Enseignant</th><th>Effectif</th><th>Statut</th></tr>
-        </thead>
-        <tbody id="classesBody"></tbody>
-      </table>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <a class="back-link no-print" id="catalogBackLink" style="display:none;margin-bottom:0;">← Retour</a>
+        <div class="catalog-breadcrumb no-print" id="catalogBreadcrumb" style="margin-bottom:0;"></div>
+      </div>
+      <div class="tile-grid" id="subjectsGrid" style="margin-top:14px;"></div>
+      <div class="tile-grid" id="levelsGrid" style="display:none;margin-top:14px;"></div>
+      <div class="tile-grid" id="classesGrid" style="display:none;margin-top:14px;"></div>
       <div class="empty-msg" id="classesEmpty" style="display:none;">Aucune classe ne correspond a ces criteres.</div>
     </div>
   </div>
@@ -362,8 +363,9 @@ function renderCatalog(){
   const search = document.getElementById('searchInput').value.trim().toLowerCase();
   const subjectsGrid = document.getElementById('subjectsGrid');
   const levelsGrid = document.getElementById('levelsGrid');
-  const table = document.getElementById('classesTable');
+  const classesGrid = document.getElementById('classesGrid');
   const breadcrumb = document.getElementById('catalogBreadcrumb');
+  const backLink = document.getElementById('catalogBackLink');
 
   document.getElementById('classCount').textContent = allClasses.filter(c => c.status === 'active').length;
   document.getElementById('listLead').textContent = currentProfile.role === 'staff'
@@ -372,24 +374,26 @@ function renderCatalog(){
 
   if (search){
     breadcrumb.style.display = 'none';
+    backLink.style.display = 'none';
     subjectsGrid.style.display = 'none';
     levelsGrid.style.display = 'none';
-    table.style.display = '';
+    classesGrid.style.display = 'grid';
     const visible = allClasses.filter(c => {
       const hay = (c.name + ' ' + (c.level||'') + ' ' + subjectLabel(c.subject) + ' ' + teacherName(c.teacher_id)).toLowerCase();
       return hay.includes(search);
     });
-    renderClassesTable(visible);
+    renderClassesGrid(visible, true);
     return;
   }
 
   breadcrumb.style.display = 'flex';
+  backLink.style.display = catalogSubject ? 'inline-flex' : 'none';
   renderBreadcrumb();
 
   if (!catalogSubject){
     subjectsGrid.style.display = 'grid';
     levelsGrid.style.display = 'none';
-    table.style.display = 'none';
+    classesGrid.style.display = 'none';
     renderSubjectsGrid();
     document.getElementById('classesEmpty').style.display = distinctSubjects().length ? 'none' : 'block';
     return;
@@ -398,7 +402,7 @@ function renderCatalog(){
   if (!catalogLevel){
     subjectsGrid.style.display = 'none';
     levelsGrid.style.display = 'grid';
-    table.style.display = 'none';
+    classesGrid.style.display = 'none';
     renderLevelsGrid();
     document.getElementById('classesEmpty').style.display = 'none';
     return;
@@ -406,10 +410,16 @@ function renderCatalog(){
 
   subjectsGrid.style.display = 'none';
   levelsGrid.style.display = 'none';
-  table.style.display = '';
+  classesGrid.style.display = 'grid';
   const filtered = classesForSubject(catalogSubject).filter(c => levelKey(c) === catalogLevel);
-  renderClassesTable(filtered);
+  renderClassesGrid(filtered, false);
 }
+
+document.getElementById('catalogBackLink').addEventListener('click', () => {
+  if (catalogLevel){ catalogLevel = null; }
+  else if (catalogSubject){ catalogSubject = null; }
+  renderCatalog();
+});
 
 function renderBreadcrumb(){
   const bc = document.getElementById('catalogBreadcrumb');
@@ -464,26 +474,28 @@ function renderLevelsGrid(){
   });
 }
 
-function renderClassesTable(list){
-  const body = document.getElementById('classesBody');
-  body.innerHTML = '';
+function renderClassesGrid(list, showSubjectLevel){
+  const grid = document.getElementById('classesGrid');
+  grid.innerHTML = '';
   document.getElementById('classesEmpty').style.display = list.length ? 'none' : 'block';
 
   list.forEach(c => {
     const count = rosterCounts[c.id] || 0;
     const full = count >= c.capacity;
-    const tr = document.createElement('tr');
-    tr.className = 'clickable';
-    tr.innerHTML = `
-      <td>${c.name}</td>
-      <td><span class="subject-pill">${subjectLabel(c.subject)}</span></td>
-      <td>${c.level || '—'}</td>
-      <td>${teacherName(c.teacher_id)}</td>
-      <td class="${full ? 'cap-full' : ''}">${count} / ${c.capacity}</td>
-      <td><span class="status-pill ${c.status==='active'?'status-active':'status-disabled'}">${c.status==='active'?'Active':'Archivee'}</span></td>
+    const sub = showSubjectLevel
+      ? [subjectLabel(c.subject), c.level || null].filter(Boolean).join(' · ')
+      : (teacherName(c.teacher_id) !== '—' ? teacherName(c.teacher_id) : '');
+    const tile = document.createElement('div');
+    tile.className = 'tile' + (full ? ' cap-full' : '');
+    tile.innerHTML = `
+      <div class="tile-icon">${subjectIcon(c.subject)}</div>
+      <div class="tile-label">${c.name}</div>
+      ${sub ? `<div class="tile-sub">${sub}</div>` : ''}
+      <div class="tile-count">👤 ${count} / ${c.capacity} eleves</div>
+      <span class="status-pill tile-status ${c.status==='active'?'status-active':'status-disabled'}">${c.status==='active'?'Active':'Archivee'}</span>
     `;
-    tr.addEventListener('click', () => openDetail(c.id));
-    body.appendChild(tr);
+    tile.addEventListener('click', () => openDetail(c.id));
+    grid.appendChild(tile);
   });
 }
 
