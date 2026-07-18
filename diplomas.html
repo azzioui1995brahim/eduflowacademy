@@ -58,12 +58,22 @@
   .card-head-row h2{margin:0;}
   label{display:block;font-weight:600;font-size:0.82rem;margin-bottom:5px;color:var(--ink);}
   .field{margin-bottom:14px;}
-  input[type=text]{
+  input[type=text], select{
     width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid var(--line);
     font-family:'Inter',sans-serif;font-size:0.9rem;background:#FAFBFB;color:var(--ink);
   }
-  input[type=text]:focus{outline:none;border-color:var(--blue);}
-  .form-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  input[type=text]:focus, select:focus{outline:none;border-color:var(--blue);}
+  .form-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+
+  .class-gen-roster{
+    display:flex;flex-wrap:wrap;gap:6px;margin:12px 0;max-height:160px;overflow-y:auto;
+    padding:10px;border:1.5px solid var(--line);border-radius:12px;background:#FAFBFB;
+  }
+  .class-gen-roster .roster-chip{
+    background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 11px;
+    font-size:0.8rem;color:var(--ink);
+  }
+  #searchHistoryInput{margin-bottom:12px;}
 
   .table-scroll{overflow-x:auto;}
   table.history-table{width:100%;border-collapse:collapse;font-size:0.86rem;}
@@ -98,6 +108,8 @@
 
   /* ---- Diploma view ---- */
   #diplomaView{display:none;}
+  #batchDiplomaView{display:none;}
+  .batch-diploma-item{margin-bottom:24px;}
   .diploma-actions{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
   .btn-sm{
     font-family:'Quicksand',sans-serif;font-weight:700;font-size:0.85rem;
@@ -184,6 +196,8 @@
     .wrap{max-width:none;}
     .diploma-stage{box-shadow:none;max-width:none;width:100%;aspect-ratio:auto;height:100vh;
       -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .batch-diploma-item{page-break-after:always;}
+    .batch-diploma-item:last-child{page-break-after:auto;}
     @page{ size: landscape; margin: 0.3in; }
   }
 </style>
@@ -230,9 +244,24 @@
       </div>
     </div>
 
+    <div class="card" id="classGenCard">
+      <h2>🏫 Generer par classe <span class="count-badge" id="classGenCount">0</span></h2>
+      <p class="lead">Generez et imprimez en un seul lot les diplomes de tous les eleves actifs d'une classe.</p>
+      <div class="field">
+        <label for="classSelect">Classe</label>
+        <select id="classSelect"><option value="">— Choisir une classe —</option></select>
+      </div>
+      <div class="class-gen-roster" id="classGenRoster" style="display:none;"></div>
+      <div class="empty-msg" id="classGenEmpty" style="display:none;">Aucun eleve actif dans cette classe.</div>
+      <div class="form-actions">
+        <button class="btn-sm" id="classGenBtn" disabled>🎖️ Generer et imprimer toute la classe</button>
+      </div>
+    </div>
+
     <div class="card" id="historyCard">
       <h2>📜 Historique des diplomes <span class="count-badge" id="historyCount">0</span></h2>
       <p class="lead">Diplomes deja imprimes — reimprimez ou supprimez une entree.</p>
+      <input type="text" id="searchHistoryInput" placeholder="Rechercher un eleve ou une matiere dans l'historique...">
       <div class="table-scroll">
         <table class="history-table">
           <thead><tr><th>Eleve</th><th>Matiere</th><th>Date</th><th>Actions</th></tr></thead>
@@ -241,6 +270,15 @@
       </div>
       <div class="empty-msg" id="historyEmpty" style="display:none;">Aucun diplome imprime pour l'instant.</div>
     </div>
+  </div>
+
+  <!-- BATCH DIPLOMA VIEW (generate-by-class) -->
+  <div id="batchDiplomaView">
+    <div class="diploma-actions no-print">
+      <button class="btn-sm btn-ghost" id="batchBackBtn">← Retour a la liste</button>
+      <button class="btn-sm" id="batchPrintBtn">🖨️ Imprimer tous les diplomes</button>
+    </div>
+    <div id="batchDiplomaList"></div>
   </div>
 
   <!-- DIPLOMA VIEW -->
@@ -315,8 +353,12 @@
 let allStudents = [];
 let enrollmentsByStudent = {}; // student_id -> [{subject}] deduped
 let diplomaHistory = [];
+let historySearchTerm = '';
 let pendingDiplomaRecord = null; // set when a diploma is opened; logged to history on print
+let pendingBatchRecords = []; // set when a class batch is opened; logged to history on batch print
 let currentAdminId = null;
+let allClasses = [];
+let classRosterCache = {}; // class_id -> [{id, full_name}]
 
 function fmtDateLong(d){
   return d.toLocaleDateString('fr-FR', { year:'numeric', month:'long', day:'numeric' });
@@ -412,6 +454,151 @@ function openDiplomaCustom(name, label){
   pendingDiplomaRecord = { student_id: null, student_name: name, subject_code: null, subject_label: label };
 }
 
+async function loadClasses(){
+  const { data, error } = await eduflowClient.from('classes').select('id, name, subject').eq('status', 'active').order('name');
+  if (error){ console.error(error); return; }
+  allClasses = data || [];
+  const sel = document.getElementById('classSelect');
+  sel.innerHTML = '<option value="">— Choisir une classe —</option>' +
+    allClasses.map(c => `<option value="${c.id}">${c.name} (${EDUFLOW_SUBJECT_LABELS[c.subject] || c.subject})</option>`).join('');
+}
+
+async function loadClassRoster(classId){
+  const { data, error } = await eduflowClient
+    .from('enrollments')
+    .select('student_id, status, students(id, full_name, student_code, status)')
+    .eq('class_id', classId)
+    .eq('status', 'active');
+  if (error){ console.error(error); return []; }
+  return (data || []).map(e => e.students).filter(s => s && s.status === 'active');
+}
+
+document.getElementById('classSelect').addEventListener('change', async () => {
+  const classId = document.getElementById('classSelect').value;
+  const roster = document.getElementById('classGenRoster');
+  const empty = document.getElementById('classGenEmpty');
+  const btn = document.getElementById('classGenBtn');
+  const countBadge = document.getElementById('classGenCount');
+
+  roster.style.display = 'none';
+  roster.innerHTML = '';
+  empty.style.display = 'none';
+  btn.disabled = true;
+
+  if (!classId){
+    countBadge.textContent = '0';
+    return;
+  }
+  const students = await loadClassRoster(classId);
+  classRosterCache[classId] = students;
+  countBadge.textContent = students.length;
+  if (!students.length){
+    empty.style.display = 'block';
+    return;
+  }
+  roster.innerHTML = students.map(s => `<span class="roster-chip">${s.full_name}</span>`).join('');
+  roster.style.display = 'flex';
+  btn.disabled = false;
+});
+
+function buildDiplomaStageHTML({ idx, name, subjectLabel, color, icon, dateText }){
+  return `
+    <div class="diploma-stage batch-diploma-item" style="--diploma-color:${color};">
+      <div class="diploma-inner">
+        <div class="diploma-watermark"></div>
+        <div class="diploma-star-watermark">
+          <svg viewBox="0 0 100 100"><path d="M50,10 L73.52,82.36 L11.96,37.64 L88.04,37.64 L26.48,82.36 Z" fill="none" stroke="#006233" stroke-width="2.5"/></svg>
+        </div>
+        <div class="diploma-corner-star tl"><svg viewBox="0 0 100 100"><path d="M50,10 L73.52,82.36 L11.96,37.64 L88.04,37.64 L26.48,82.36 Z" fill="#006233"/></svg></div>
+        <div class="diploma-corner-star tr"><svg viewBox="0 0 100 100"><path d="M50,10 L73.52,82.36 L11.96,37.64 L88.04,37.64 L26.48,82.36 Z" fill="#006233"/></svg></div>
+        <div class="diploma-corner-star bl"><svg viewBox="0 0 100 100"><path d="M50,10 L73.52,82.36 L11.96,37.64 L88.04,37.64 L26.48,82.36 Z" fill="#006233"/></svg></div>
+        <div class="diploma-corner-star br"><svg viewBox="0 0 100 100"><path d="M50,10 L73.52,82.36 L11.96,37.64 L88.04,37.64 L26.48,82.36 Z" fill="#006233"/></svg></div>
+
+        <div class="diploma-logo-row">
+          <img class="diploma-logo" src="media/logo.jpg" alt="Edu Flow Academy">
+          <span class="diploma-emblem-badge"><svg viewBox="0 0 100 100"><path d="M50,10 L73.52,82.36 L11.96,37.64 L88.04,37.64 L26.48,82.36 Z" fill="#fff"/></svg></span>
+        </div>
+        <div class="diploma-header-row">
+          <div class="diploma-academy">Edu Flow Academy</div>
+          <div class="diploma-header-sep">•</div>
+          <div class="diploma-kingdom-text">
+            <svg class="flag-chip" viewBox="0 0 300 200"><rect width="300" height="200" fill="#C1272D"/><path d="M150,60 L173.52,132.36 L111.96,87.64 L188.04,87.64 L126.48,132.36 Z" fill="none" stroke="#006233" stroke-width="6"/></svg>
+            Royaume du Maroc
+          </div>
+        </div>
+        <div class="diploma-title">Certificat de Reussite</div>
+        <div class="diploma-icon">${icon}</div>
+        <div class="diploma-line">Ce certificat est decerne a</div>
+        <div class="diploma-name">${name}</div>
+        <div class="diploma-line">pour avoir suivi avec succes la formation en</div>
+        <div class="diploma-subject">${subjectLabel}</div>
+        <div class="diploma-footer">
+          <div class="diploma-sign">
+            <div class="diploma-stamp" style="color:var(--ma-red);">
+              <svg viewBox="0 0 140 140">
+                <defs>
+                  <path id="stampTop-${idx}" d="M20,72 A50,50 0 1,1 120,72" fill="none"/>
+                  <path id="stampBot-${idx}" d="M120,74 A50,50 0 1,1 20,74" fill="none"/>
+                </defs>
+                <circle cx="70" cy="70" r="63" fill="none" stroke="currentColor" stroke-width="2"/>
+                <circle cx="70" cy="70" r="53" fill="none" stroke="currentColor" stroke-width="1"/>
+                <text font-size="9" font-family="Quicksand,sans-serif" font-weight="700" fill="currentColor" letter-spacing="2">
+                  <textPath href="#stampTop-${idx}" startOffset="50%" text-anchor="middle">EDU FLOW ACADEMY</textPath>
+                </text>
+                <text font-size="8" font-family="Quicksand,sans-serif" font-weight="700" fill="currentColor" letter-spacing="3">
+                  <textPath href="#stampBot-${idx}" startOffset="50%" text-anchor="middle">CACHET OFFICIEL</textPath>
+                </text>
+                <path d="M70,48 L82.94,87.80 L49.08,63.20 L90.92,63.20 L57.06,87.80 Z" fill="none" stroke="currentColor" stroke-width="2.2"/>
+              </svg>
+            </div>
+            <div class="sig-line">La Direction</div>Edu Flow Academy
+          </div>
+          <div class="diploma-sign"><div class="sig-line">Formateur(trice)</div>Signature</div>
+        </div>
+        <div class="diploma-date">${dateText}</div>
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('classGenBtn').addEventListener('click', () => {
+  const classId = document.getElementById('classSelect').value;
+  const classInfo = allClasses.find(c => c.id === classId);
+  const students = classRosterCache[classId] || [];
+  if (!classInfo || !students.length) return;
+
+  const theme = subjectTheme(classInfo.subject);
+  const label = EDUFLOW_SUBJECT_LABELS[classInfo.subject] || classInfo.subject;
+  const dateText = 'Delivre le ' + fmtDateLong(new Date());
+
+  pendingBatchRecords = students.map(s => ({
+    student_id: s.id, student_name: s.full_name, subject_code: classInfo.subject, subject_label: label
+  }));
+
+  document.getElementById('batchDiplomaList').innerHTML = students.map((s, i) => buildDiplomaStageHTML({
+    idx: i, name: s.full_name, subjectLabel: label, color: theme.color, icon: theme.icon, dateText
+  })).join('');
+
+  document.getElementById('listView').style.display = 'none';
+  document.getElementById('batchDiplomaView').style.display = 'block';
+  window.scrollTo(0, 0);
+});
+
+document.getElementById('batchBackBtn').addEventListener('click', () => {
+  document.getElementById('batchDiplomaView').style.display = 'none';
+  document.getElementById('listView').style.display = 'block';
+});
+
+document.getElementById('batchPrintBtn').addEventListener('click', async () => {
+  if (pendingBatchRecords.length){
+    const rows = pendingBatchRecords.map(r => Object.assign({}, r, { issued_by: currentAdminId }));
+    const { error } = await eduflowClient.from('diplomas').insert(rows);
+    if (!error) await loadHistory();
+    pendingBatchRecords = [];
+  }
+  window.print();
+});
+
 function reprintDiploma(rec){
   const theme = rec.subject_code ? subjectTheme(rec.subject_code) : { color:'#3FAEDD', icon:'🎓' };
   document.getElementById('diplomaStage').style.setProperty('--diploma-color', theme.color);
@@ -438,9 +625,16 @@ function renderHistory(){
   const empty = document.getElementById('historyEmpty');
   document.getElementById('historyCount').textContent = diplomaHistory.length;
   body.innerHTML = '';
-  empty.style.display = diplomaHistory.length ? 'none' : 'block';
 
-  diplomaHistory.forEach(rec => {
+  const filtered = diplomaHistory.filter(rec => {
+    if (!historySearchTerm) return true;
+    const hay = (rec.student_name + ' ' + rec.subject_label).toLowerCase();
+    return hay.includes(historySearchTerm);
+  });
+  empty.textContent = diplomaHistory.length ? "Aucun resultat pour cette recherche." : "Aucun diplome imprime pour l'instant.";
+  empty.style.display = filtered.length ? 'none' : 'block';
+
+  filtered.forEach(rec => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${rec.student_name}</td>
@@ -510,6 +704,10 @@ document.getElementById('addStudentGenerateBtn').addEventListener('click', () =>
 });
 
 document.getElementById('searchInput').addEventListener('input', renderList);
+document.getElementById('searchHistoryInput').addEventListener('input', (e) => {
+  historySearchTerm = e.target.value.trim().toLowerCase();
+  renderHistory();
+});
 document.getElementById('logoutBtn').addEventListener('click', eduflowLogout);
 
 (async () => {
@@ -522,6 +720,7 @@ document.getElementById('logoutBtn').addEventListener('click', eduflowLogout);
   document.getElementById('app').style.display = 'block';
   await loadAll();
   await loadHistory();
+  await loadClasses();
 })();
 </script>
 </body>

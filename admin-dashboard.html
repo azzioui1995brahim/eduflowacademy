@@ -211,6 +211,19 @@
     padding:3px 5px;border-radius:6px;vertical-align:middle;
   }
   .btn-copy-code:hover{background:#F0F3F2;}
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(16,20,26,0.5);z-index:100;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .modal-box{
+    background:#fff;border-radius:var(--radius);padding:26px;max-width:540px;width:100%;
+    box-shadow:0 24px 64px rgba(0,0,0,0.32);max-height:85vh;overflow-y:auto;
+  }
+  .modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
+  .modal-head h2{margin:0;}
+  .modal-close{border:none;background:none;font-size:1.05rem;cursor:pointer;color:#9A9B9C;padding:5px 9px;border-radius:8px;line-height:1;}
+  .modal-close:hover{background:#F0F3F2;color:var(--ink);}
 </style>
 </head>
 <body>
@@ -229,6 +242,7 @@
       <div class="sidebar-who" id="whoLabel"></div>
       <div class="sidebar-nav">
         <a href="#accounts" class="sidebar-link" data-label="Comptes"><span class="ic">👤</span><span class="txt">Comptes</span></a>
+        <button class="sidebar-link" id="openCodesBtn" data-label="Codes d'acces"><span class="ic">🔑</span><span class="txt">Codes d'acces</span></button>
         <a href="students.html" class="sidebar-link" data-label="Eleves"><span class="ic">🎓</span><span class="txt">Eleves</span></a>
         <a href="classes.html" class="sidebar-link" data-label="Classes"><span class="ic">📚</span><span class="txt">Classes</span></a>
         <a href="timetable.html" class="sidebar-link" data-label="Emploi du temps"><span class="ic">🗓️</span><span class="txt">Emploi du temps</span></a>
@@ -267,32 +281,6 @@
           <a href="payments.html" class="btn-sm btn-reset" style="text-decoration:none;display:inline-block;">Paiements eleves</a>
           <a href="workshops.html" class="btn-sm btn-reset" style="text-decoration:none;display:inline-block;">Ateliers &amp; formations</a>
         </div>
-      </div>
-
-      <div class="card card-gold">
-        <h2>🔑 Codes d'acces</h2>
-        <p class="lead">Codes partages a communiquer selon le profil de la personne — pas des mots de passe individuels.</p>
-        <table class="access-codes-table">
-          <tbody>
-            <tr>
-              <td>Code plateforme <span style="color:#B8BCBA;">(eleves — test de positionnement)</span></td>
-              <td><span class="access-code">EFA-7M9HYX</span><button class="btn-copy-code copy-code-btn" data-code="EFA-7M9HYX" title="Copier">📋</button></td>
-            </tr>
-            <tr>
-              <td>Code resultats <span style="color:#B8BCBA;">(personnel — archive des tests)</span></td>
-              <td><span class="access-code">STAFF-F6WSAR</span><button class="btn-copy-code copy-code-btn" data-code="STAFF-F6WSAR" title="Copier">📋</button></td>
-            </tr>
-            <tr>
-              <td>Invitation inscription — Personnel enseignant</td>
-              <td><span class="access-code">STAFF-INVITE-9K3PQX</span><button class="btn-copy-code copy-code-btn" data-code="STAFF-INVITE-9K3PQX" title="Copier">📋</button></td>
-            </tr>
-            <tr>
-              <td>Invitation inscription — Reception</td>
-              <td><span class="access-code">RECEPTION-INVITE-7H2WLD</span><button class="btn-copy-code copy-code-btn" data-code="RECEPTION-INVITE-7H2WLD" title="Copier">📋</button></td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="lead" style="margin:12px 0 0;font-size:0.78rem;">⚠️ Simples codes partages, pas une authentification individuelle — visibles par quiconque lit le code source du site. Les codes d'invitation ne font qu'ouvrir le formulaire d'inscription : chaque nouveau compte reste "en attente" jusqu'a votre validation dans "Tous les comptes" plus bas.</p>
       </div>
 
       <div class="card card-gold">
@@ -387,6 +375,37 @@
       </div>
 
     </main>
+  </div>
+
+  <div class="modal-overlay no-print" id="codesModalOverlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>🔑 Codes d'acces</h2>
+        <button class="modal-close" id="closeCodesModal">✕</button>
+      </div>
+      <p class="lead">Codes partages a communiquer selon le profil de la personne — pas des mots de passe individuels.</p>
+      <table class="access-codes-table">
+        <tbody>
+          <tr>
+            <td>Code plateforme <span style="color:#B8BCBA;">(eleves — test de positionnement)</span></td>
+            <td><span class="access-code">EFA-7M9HYX</span><button class="btn-copy-code copy-code-btn" data-code="EFA-7M9HYX" title="Copier">📋</button></td>
+          </tr>
+          <tr>
+            <td>Code resultats <span style="color:#B8BCBA;">(personnel — archive des tests)</span></td>
+            <td><span class="access-code">STAFF-F6WSAR</span><button class="btn-copy-code copy-code-btn" data-code="STAFF-F6WSAR" title="Copier">📋</button></td>
+          </tr>
+          <tr>
+            <td>Invitation inscription — Personnel enseignant</td>
+            <td><span class="access-code">STAFF-INVITE-9K3PQX</span><button class="btn-copy-code copy-code-btn" data-code="STAFF-INVITE-9K3PQX" title="Copier">📋</button></td>
+          </tr>
+          <tr>
+            <td>Invitation inscription — Reception</td>
+            <td><span class="access-code">RECEPTION-INVITE-7H2WLD</span><button class="btn-copy-code copy-code-btn" data-code="RECEPTION-INVITE-7H2WLD" title="Copier">📋</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="lead" style="margin:12px 0 0;font-size:0.78rem;">⚠️ Simples codes partages, pas une authentification individuelle — visibles par quiconque lit le code source du site. Les codes d'invitation ne font qu'ouvrir le formulaire d'inscription : chaque nouveau compte reste "en attente" jusqu'a votre validation dans "Tous les comptes".</p>
+    </div>
   </div>
 </div>
 
@@ -692,6 +711,16 @@ document.getElementById('toggleSentMsgBtn').addEventListener('click', () => {
   const show = panel.style.display === 'none';
   panel.style.display = show ? 'block' : 'none';
   btn.textContent = show ? 'Masquer' : 'Afficher';
+});
+
+document.getElementById('openCodesBtn').addEventListener('click', () => {
+  document.getElementById('codesModalOverlay').style.display = 'flex';
+});
+document.getElementById('closeCodesModal').addEventListener('click', () => {
+  document.getElementById('codesModalOverlay').style.display = 'none';
+});
+document.getElementById('codesModalOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'codesModalOverlay') document.getElementById('codesModalOverlay').style.display = 'none';
 });
 
 document.querySelectorAll('.copy-code-btn').forEach(btn => {
